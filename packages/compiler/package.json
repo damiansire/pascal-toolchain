@@ -1,6 +1,6 @@
 {
   "name": "pascal-js-compiler",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Compiles Pascal source code to JavaScript from the pascal-toolchain parser AST.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,7 +26,7 @@
   "author": "Damian Sire",
   "license": "MIT",
   "dependencies": {
-    "pascal-parser": "^0.1.0"
+    "pascal-parser": "^0.2.0"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

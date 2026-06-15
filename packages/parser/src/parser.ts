@@ -587,13 +587,22 @@ class Parser {
           location: this.location(),
         } as CallExpression;
       }
-      let expr: Expression = { type: 'Identifier', name: token.value, location: this.location() } as Identifier;
+      let expr: Expression = {
+        type: 'Identifier',
+        name: token.value,
+        location: this.location(),
+      } as Identifier;
       // Array indexing: a[i], a[i][j], ...
       while (this.check('DELIMITER_LBRACKET')) {
         this.advance();
         const index = this.parseExpression();
         this.consume('DELIMITER_RBRACKET', "Expected ']' after array index");
-        expr = { type: 'IndexExpression', array: expr, index, location: this.location() } as IndexExpression;
+        expr = {
+          type: 'IndexExpression',
+          array: expr,
+          index,
+          location: this.location(),
+        } as IndexExpression;
       }
       return expr;
     }
