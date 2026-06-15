@@ -1,0 +1,37 @@
+{
+  "name": "pascal-js-compiler",
+  "version": "0.1.0",
+  "description": "Compiles Pascal source code to JavaScript from the pascal-toolchain parser AST.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/damiansire/pascal-toolchain.git",
+    "directory": "packages/compiler"
+  },
+  "keywords": [
+    "pascal",
+    "compiler",
+    "codegen",
+    "transpiler",
+    "javascript",
+    "pascal-toolchain"
+  ],
+  "author": "Damian Sire",
+  "license": "MIT",
+  "dependencies": {
+    "pascal-parser": "^0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "files": [
+    "dist"
+  ]
+}

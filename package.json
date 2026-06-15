@@ -16,7 +16,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "npm run build -w pascal-tokenizer && npm run build -w pascal-parser && npm run build -w pascal-code-formatter",
+    "build": "npm run build -w pascal-tokenizer && npm run build -w pascal-parser && npm run build -w pascal-js-compiler && npm run build -w pascal-code-formatter",
     "test": "npm run test --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
     "changeset": "changeset",
