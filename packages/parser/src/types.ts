@@ -51,6 +51,8 @@ export interface Declaration extends ASTNode {
   body?: Block;
   // For constant declarations
   value?: Expression;
+  // For array variable declarations: array[low..high] of <varType>
+  arrayBounds?: { low: number; high: number };
 }
 
 /**
@@ -92,7 +94,7 @@ export interface Statement extends ASTNode {
  */
 export interface AssignmentStatement extends Statement {
   type: 'AssignmentStatement';
-  left: Identifier;
+  left: Identifier | IndexExpression;
   right: Expression;
 }
 
@@ -182,7 +184,8 @@ export interface Expression extends ASTNode {
     | 'NumericLiteral'
     | 'StringLiteral'
     | 'BooleanLiteral'
-    | 'CallExpression';
+    | 'CallExpression'
+    | 'IndexExpression';
 }
 
 /**
@@ -243,6 +246,15 @@ export interface CallExpression extends Expression {
   type: 'CallExpression';
   callee: string;
   arguments: Expression[];
+}
+
+/**
+ * Represents an array index access, e.g. a[i]
+ */
+export interface IndexExpression extends Expression {
+  type: 'IndexExpression';
+  array: Expression;
+  index: Expression;
 }
 
 /**

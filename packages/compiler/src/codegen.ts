@@ -30,6 +30,7 @@ import {
     StringLiteral,
     BooleanLiteral,
     CallExpression,
+    IndexExpression,
 } from 'pascal-parser';
 
 /** Options controlling the generated output. */
@@ -66,12 +67,15 @@ class CodeGenerator {
     private readonly indentUnit: string;
     /** Name of the function currently being generated, for return-by-name lowering. */
     private currentFunction: string | null = null;
+    /** Low bound of each declared array, to offset Pascal indices to 0-based JS. */
+    private arrayLowBounds = new Map<string, number>();
 
     constructor(options: CompileOptions = {}) {
         this.indentUnit = options.indent ?? '  ';
     }
 
     generate(program: Program): string {
+        this.arrayLowBounds = new Map();
         const lines: string[] = [`// Generated from Pascal program: ${program.name}`];
         for (const declaration of program.declarations) {
             lines.push(...this.genDeclaration(declaration, 0));
@@ -90,6 +94,14 @@ class CodeGenerator {
         const pad = this.pad(level);
         switch (declaration.type) {
             case 'VariableDeclaration': {
+                if (declaration.arrayBounds) {
+                    const { low, high } = declaration.arrayBounds;
+                    this.arrayLowBounds.set(declaration.name, low);
+                    const size = high - low + 1;
+                    return [
+                        `${pad}let ${declaration.name} = new Array(${size}).fill(0); // array[${low}..${high}] of ${declaration.varType}`,
+                    ];
+                }
                 const typeComment = declaration.varType ? ` // ${declaration.varType}` : '';
                 return [`${pad}let ${declaration.name};${typeComment}`];
             }
@@ -268,6 +280,18 @@ class CodeGenerator {
             case 'CallExpression': {
                 const e = expression as CallExpression;
                 return `${e.callee}(${e.arguments.map((a) => this.genExpression(a)).join(', ')})`;
+            }
+            case 'IndexExpression': {
+                const e = expression as IndexExpression;
+                const arr = this.genExpression(e.array);
+                const idx = this.genExpression(e.index);
+                // Offset Pascal's (possibly non-zero) low bound to 0-based JS indexing.
+                const low =
+                    e.array.type === 'Identifier'
+                        ? this.arrayLowBounds.get((e.array as Identifier).name)
+                        : undefined;
+                if (low !== undefined && low !== 0) return `${arr}[${idx} - ${low}]`;
+                return `${arr}[${idx}]`;
             }
             default:
                 throw new Error(`Unsupported expression: ${expression.type}`);

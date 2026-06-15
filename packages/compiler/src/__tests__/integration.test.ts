@@ -114,6 +114,23 @@ end.`);
         expect(output).toEqual([120]);
     });
 
+    it('runs a program using arrays with 1-based indexing', () => {
+        const output = run(`
+program Squares;
+var
+    a: array[1..5] of integer;
+    i, total: integer;
+begin
+    for i := 1 to 5 do
+        a[i] := i * i;
+    total := 0;
+    for i := 1 to 5 do
+        total := total + a[i];
+    writeln(total);
+end.`);
+        expect(output).toEqual([55]);
+    });
+
     it('runs a function with local variables', () => {
         const output = run(`
 program LocalVars;

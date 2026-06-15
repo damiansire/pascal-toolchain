@@ -22,6 +22,7 @@ import {
   StringLiteral,
   BooleanLiteral,
   CallExpression,
+  IndexExpression,
   SourceLocation,
 } from './types';
 import { tokenizePascal, PascalToken, TokenType } from 'pascal-tokenizer';
@@ -172,18 +173,45 @@ class Parser {
         names.push(this.consume('IDENTIFIER', 'Expected variable name').value);
       }
       this.consume('DELIMITER_COLON', "Expected ':' in variable declaration");
-      const varType = this.parseTypeName();
+      const { varType, arrayBounds } = this.parseVarType();
       this.consume('DELIMITER_SEMICOLON', "Expected ';' after variable declaration");
       for (const name of names) {
         declarations.push({
           type: 'VariableDeclaration',
           name,
           varType,
+          arrayBounds,
           location: this.location(),
         });
       }
     }
     return declarations;
+  }
+
+  /** Parses a variable's type: either a plain type or `array[lo..hi] of T`. */
+  private parseVarType(): { varType: string; arrayBounds?: { low: number; high: number } } {
+    if (this.checkKeyword('array')) {
+      this.advance();
+      this.consume('DELIMITER_LBRACKET', "Expected '[' in array type");
+      const low = this.parseIntegerBound();
+      this.consume('OPERATOR_RANGE', "Expected '..' in array bounds");
+      const high = this.parseIntegerBound();
+      this.consume('DELIMITER_RBRACKET', "Expected ']' in array type");
+      this.consumeKeyword('of', "Expected 'of' in array type");
+      const varType = this.parseTypeName();
+      return { varType, arrayBounds: { low, high } };
+    }
+    return { varType: this.parseTypeName() };
+  }
+
+  private parseIntegerBound(): number {
+    let sign = 1;
+    if (this.check('OPERATOR_MINUS')) {
+      this.advance();
+      sign = -1;
+    }
+    const token = this.consume('NUMBER_INTEGER', 'Expected integer array bound');
+    return sign * parseInt(token.value, 10);
   }
 
   private parseSubprogram(): Declaration {
@@ -381,6 +409,30 @@ class Parser {
   private parseIdentifierStatement(): Statement {
     const idToken = this.consume('IDENTIFIER', 'Expected identifier');
 
+    // Indexed assignment target: a[i] := ...
+    if (this.check('DELIMITER_LBRACKET')) {
+      let target: Identifier | IndexExpression = {
+        type: 'Identifier',
+        name: idToken.value,
+        location: this.location(),
+      };
+      while (this.check('DELIMITER_LBRACKET')) {
+        this.advance();
+        const index = this.parseExpression();
+        this.consume('DELIMITER_RBRACKET', "Expected ']' after array index");
+        target = { type: 'IndexExpression', array: target, index, location: this.location() };
+      }
+      this.consume('OPERATOR_ASSIGN', "Expected ':=' after indexed variable");
+      const right = this.parseExpression();
+      const assignment: AssignmentStatement = {
+        type: 'AssignmentStatement',
+        left: target,
+        right,
+        location: this.location(),
+      };
+      return assignment;
+    }
+
     if (this.check('OPERATOR_ASSIGN')) {
       this.advance();
       const right = this.parseExpression();
@@ -535,7 +587,15 @@ class Parser {
           location: this.location(),
         } as CallExpression;
       }
-      return { type: 'Identifier', name: token.value, location: this.location() } as Identifier;
+      let expr: Expression = { type: 'Identifier', name: token.value, location: this.location() } as Identifier;
+      // Array indexing: a[i], a[i][j], ...
+      while (this.check('DELIMITER_LBRACKET')) {
+        this.advance();
+        const index = this.parseExpression();
+        this.consume('DELIMITER_RBRACKET', "Expected ']' after array index");
+        expr = { type: 'IndexExpression', array: expr, index, location: this.location() } as IndexExpression;
+      }
+      return expr;
     }
 
     throw new ParseError(`Unexpected token in expression: '${token.value}'`);

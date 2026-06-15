@@ -243,6 +243,26 @@ end.`);
       });
     });
 
+    it('parses array declarations and indexed access', () => {
+      const ast = parse(
+        `program P; var a: array[1..5] of integer; i: integer; begin a[1] := 10; i := a[1]; end.`,
+      );
+      expect(ast.declarations[0]).toMatchObject({
+        type: 'VariableDeclaration',
+        name: 'a',
+        varType: 'integer',
+        arrayBounds: { low: 1, high: 5 },
+      });
+      expect(ast.statements[0]).toMatchObject({
+        type: 'AssignmentStatement',
+        left: { type: 'IndexExpression', index: { type: 'NumericLiteral', value: 1 } },
+      });
+      expect(ast.statements[1]).toMatchObject({
+        type: 'AssignmentStatement',
+        right: { type: 'IndexExpression' },
+      });
+    });
+
     it('parses local var declarations inside a subprogram body', () => {
       const ast = parse(`
 program P;

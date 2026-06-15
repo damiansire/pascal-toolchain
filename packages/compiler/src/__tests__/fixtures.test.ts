@@ -37,4 +37,8 @@ describe('real Pascal programs (fixtures) — compile and run', () => {
     it('grades.pas — case..of with else', () => {
         expect(runFixture('grades.pas')).toEqual(['ok']);
     });
+
+    it('bubblesort.pas — arrays, nested loops, in-place swap', () => {
+        expect(runFixture('bubblesort.pas')).toEqual([1, 2, 5, 8, 9]);
+    });
 });
