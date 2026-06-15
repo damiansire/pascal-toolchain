@@ -1,5 +1,11 @@
 # pascal-js-compiler
 
+## 0.3.0
+
+### Minor Changes
+
+- d694653: Add Pascal builtins: `inc`/`dec` statements and `abs`, `sqr`, `sqrt`, `trunc`, `round`, `odd` functions.
+
 ## 0.2.0
 
 ### Minor Changes
