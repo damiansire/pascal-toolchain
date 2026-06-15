@@ -2,6 +2,8 @@ import {
     Program,
     ParseError,
     Declaration,
+    Parameter,
+    Block,
     Statement,
     AssignmentStatement,
     IfStatement,
@@ -128,27 +130,84 @@ class Parser {
 
     private parseDeclarations(): Declaration[] {
         const declarations: Declaration[] = [];
-        if (this.checkKeyword('var')) {
-            this.advance();
-            while (this.check('IDENTIFIER')) {
-                const names = [this.consume('IDENTIFIER', 'Expected variable name').value];
-                while (this.match('DELIMITER_COMMA')) {
-                    names.push(this.consume('IDENTIFIER', 'Expected variable name').value);
-                }
-                this.consume('DELIMITER_COLON', "Expected ':' in variable declaration");
-                const varType = this.parseTypeName();
-                this.consume('DELIMITER_SEMICOLON', "Expected ';' after variable declaration");
-                for (const name of names) {
-                    declarations.push({
-                        type: 'VariableDeclaration',
-                        name,
-                        varType,
-                        location: this.location(),
-                    });
-                }
+        while (this.checkKeyword('var') || this.checkKeyword('procedure') || this.checkKeyword('function')) {
+            if (this.checkKeyword('var')) {
+                declarations.push(...this.parseVarSection());
+            } else {
+                declarations.push(this.parseSubprogram());
             }
         }
         return declarations;
+    }
+
+    private parseVarSection(): Declaration[] {
+        this.consumeKeyword('var', "Expected 'var'");
+        const declarations: Declaration[] = [];
+        while (this.check('IDENTIFIER')) {
+            const names = [this.consume('IDENTIFIER', 'Expected variable name').value];
+            while (this.match('DELIMITER_COMMA')) {
+                names.push(this.consume('IDENTIFIER', 'Expected variable name').value);
+            }
+            this.consume('DELIMITER_COLON', "Expected ':' in variable declaration");
+            const varType = this.parseTypeName();
+            this.consume('DELIMITER_SEMICOLON', "Expected ';' after variable declaration");
+            for (const name of names) {
+                declarations.push({ type: 'VariableDeclaration', name, varType, location: this.location() });
+            }
+        }
+        return declarations;
+    }
+
+    private parseSubprogram(): Declaration {
+        const isFunction = this.checkKeyword('function');
+        this.advance(); // 'procedure' | 'function'
+        const nameToken = this.consume('IDENTIFIER', 'Expected subprogram name');
+        const parameters = this.check('DELIMITER_LPAREN') ? this.parseParameterList() : [];
+        let returnType: string | undefined;
+        if (isFunction) {
+            this.consume('DELIMITER_COLON', "Expected ':' before function return type");
+            returnType = this.parseTypeName();
+        }
+        this.consume('DELIMITER_SEMICOLON', "Expected ';' after subprogram header");
+        const body = this.parseBlock();
+        this.consume('DELIMITER_SEMICOLON', "Expected ';' after subprogram body");
+        return {
+            type: isFunction ? 'FunctionDeclaration' : 'ProcedureDeclaration',
+            name: nameToken.value,
+            parameters,
+            returnType,
+            body,
+            location: this.location(),
+        };
+    }
+
+    private parseParameterList(): Parameter[] {
+        this.consume('DELIMITER_LPAREN', "Expected '('");
+        const params: Parameter[] = [];
+        if (!this.check('DELIMITER_RPAREN')) {
+            do {
+                const isVar = this.checkKeyword('var');
+                if (isVar) this.advance();
+                const names = [this.consume('IDENTIFIER', 'Expected parameter name').value];
+                while (this.match('DELIMITER_COMMA')) {
+                    names.push(this.consume('IDENTIFIER', 'Expected parameter name').value);
+                }
+                this.consume('DELIMITER_COLON', "Expected ':' in parameter list");
+                const paramType = this.parseTypeName();
+                for (const name of names) {
+                    params.push({ type: 'Parameter', name, paramType, isVar, location: this.location() });
+                }
+            } while (this.match('DELIMITER_SEMICOLON'));
+        }
+        this.consume('DELIMITER_RPAREN', "Expected ')'");
+        return params;
+    }
+
+    private parseBlock(): Block {
+        this.consumeKeyword('begin', "Expected 'begin'");
+        const statements = this.parseStatementList();
+        this.consumeKeyword('end', "Expected 'end'");
+        return { type: 'Block', statements, location: this.location() };
     }
 
     private parseTypeName(): string {

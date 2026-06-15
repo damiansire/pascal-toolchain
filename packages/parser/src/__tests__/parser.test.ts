@@ -205,5 +205,41 @@ end.`);
             expect(ifStmt.thenBranch).toMatchObject({ type: 'CompoundStatement' });
             expect(ifStmt.thenBranch.statements).toHaveLength(2);
         });
+
+        it('parses a function declaration with parameters and return type', () => {
+            const ast = parse(`
+program P;
+function double(n: integer): integer;
+begin
+    double := n * 2;
+end;
+begin
+    writeln(double(21));
+end.`);
+            expect(ast.declarations[0]).toMatchObject({
+                type: 'FunctionDeclaration',
+                name: 'double',
+                returnType: 'integer',
+                parameters: [{ type: 'Parameter', name: 'n', paramType: 'integer', isVar: false }],
+                body: { type: 'Block' },
+            });
+        });
+
+        it('parses a procedure with a var (by-reference) parameter', () => {
+            const ast = parse(`
+program P;
+procedure reset(var x: integer);
+begin
+    x := 0;
+end;
+begin
+    writeln('ok');
+end.`);
+            expect(ast.declarations[0]).toMatchObject({
+                type: 'ProcedureDeclaration',
+                name: 'reset',
+                parameters: [{ type: 'Parameter', name: 'x', paramType: 'integer', isVar: true }],
+            });
+        });
     });
 });

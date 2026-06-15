@@ -62,6 +62,8 @@ const UNARY_OPERATORS: Record<string, string> = {
 
 class CodeGenerator {
     private readonly indentUnit: string;
+    /** Name of the function currently being generated, for return-by-name lowering. */
+    private currentFunction: string | null = null;
 
     constructor(options: CompileOptions = {}) {
         this.indentUnit = options.indent ?? '  ';
@@ -89,11 +91,23 @@ class CodeGenerator {
                 const typeComment = declaration.varType ? ` // ${declaration.varType}` : '';
                 return [`${pad}let ${declaration.name};${typeComment}`];
             }
-            case 'FunctionDeclaration':
             case 'ProcedureDeclaration': {
                 const params = (declaration.parameters ?? []).map((p) => p.name).join(', ');
                 const lines = [`${pad}function ${declaration.name}(${params}) {`];
                 if (declaration.body) lines.push(...this.genBlock(declaration.body, level + 1));
+                lines.push(`${pad}}`);
+                return lines;
+            }
+            case 'FunctionDeclaration': {
+                const params = (declaration.parameters ?? []).map((p) => p.name).join(', ');
+                const lines = [`${pad}function ${declaration.name}(${params}) {`];
+                // Pascal functions return by assigning to their own name; lower it to `$result`.
+                lines.push(`${this.pad(level + 1)}let $result;`);
+                const previous = this.currentFunction;
+                this.currentFunction = declaration.name;
+                if (declaration.body) lines.push(...this.genBlock(declaration.body, level + 1));
+                this.currentFunction = previous;
+                lines.push(`${this.pad(level + 1)}return $result;`);
                 lines.push(`${pad}}`);
                 return lines;
             }
@@ -127,6 +141,10 @@ class CodeGenerator {
         switch (statement.type) {
             case 'AssignmentStatement': {
                 const s = statement as AssignmentStatement;
+                // Assignment to the enclosing function's name is a return value.
+                if (this.currentFunction && s.left.type === 'Identifier' && s.left.name === this.currentFunction) {
+                    return [`${pad}$result = ${this.genExpression(s.right)};`];
+                }
                 return [`${pad}${this.genExpression(s.left)} = ${this.genExpression(s.right)};`];
             }
             case 'IfStatement': {

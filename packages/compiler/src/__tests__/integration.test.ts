@@ -71,4 +71,46 @@ begin
 end.`);
         expect(output).toEqual([14]);
     });
+
+    it('runs a function (return-by-name lowered to return)', () => {
+        const output = run(`
+program Doubler;
+function double(n: integer): integer;
+begin
+    double := n * 2;
+end;
+begin
+    writeln(double(21));
+end.`);
+        expect(output).toEqual([42]);
+    });
+
+    it('runs a procedure call', () => {
+        const output = run(`
+program Greeter;
+procedure greet(name: string);
+begin
+    writeln(name);
+end;
+begin
+    greet('hola');
+end.`);
+        expect(output).toEqual(['hola']);
+    });
+
+    it('runs a recursive function (factorial)', () => {
+        const output = run(`
+program Fact;
+function fact(n: integer): integer;
+begin
+    if n <= 1 then
+        fact := 1
+    else
+        fact := n * fact(n - 1);
+end;
+begin
+    writeln(fact(5));
+end.`);
+        expect(output).toEqual([120]);
+    });
 });
