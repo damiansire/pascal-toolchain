@@ -20,7 +20,7 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Build (ordered: tokenizer → parser → compiler → formatter)
+      - name: Build (ordered across packages)
         run: npm run build
 
       - name: Test
