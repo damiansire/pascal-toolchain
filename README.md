@@ -1,6 +1,6 @@
 # pascal-toolchain
 
-A **Pascal compiler frontend** written in TypeScript, organized as a pnpm monorepo.
+A **Pascal compiler frontend** written in TypeScript, organized as an npm-workspaces monorepo.
 Each stage is published as its own npm package, but they evolve together here.
 
 ## The pipeline
@@ -27,9 +27,9 @@ source.pas
 ## Development
 
 ```bash
-pnpm install      # install all workspace deps
-pnpm build        # build every package
-pnpm test         # run every package's tests
+npm install         # install all workspace deps (links packages together)
+npm run build       # build every package
+npm test            # run every package's tests
 ```
 
 ## Releasing
@@ -38,9 +38,9 @@ Versioning and publishing are handled with [Changesets](https://github.com/chang
 each package keeps its own version and is published under its own unique name.
 
 ```bash
-pnpm changeset           # describe the change + bump
-pnpm version-packages    # apply version bumps
-pnpm release             # build + publish changed packages
+npm run changeset          # describe the change + bump
+npm run version-packages   # apply version bumps
+npm run release            # build + publish changed packages
 ```
 
 ## License
