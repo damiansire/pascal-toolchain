@@ -124,6 +124,9 @@ class CodeGenerator {
 
     private genBlock(block: Block, level: number): string[] {
         const lines: string[] = [];
+        for (const declaration of block.declarations ?? []) {
+            lines.push(...this.genDeclaration(declaration, level));
+        }
         for (const statement of block.statements) {
             lines.push(...this.genStatement(statement, level));
         }

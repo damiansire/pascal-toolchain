@@ -68,6 +68,7 @@ export interface Parameter extends ASTNode {
  */
 export interface Block extends ASTNode {
   type: 'Block';
+  declarations?: Declaration[];
   statements: Statement[];
 }
 

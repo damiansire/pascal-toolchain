@@ -232,10 +232,12 @@ class Parser {
   }
 
   private parseBlock(): Block {
+    // Local declarations (var/const, even nested subprograms) before begin..end.
+    const declarations = this.parseDeclarations();
     this.consumeKeyword('begin', "Expected 'begin'");
     const statements = this.parseStatementList();
     this.consumeKeyword('end', "Expected 'end'");
-    return { type: 'Block', statements, location: this.location() };
+    return { type: 'Block', declarations, statements, location: this.location() };
   }
 
   private parseTypeName(): string {

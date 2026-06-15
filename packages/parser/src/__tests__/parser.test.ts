@@ -243,6 +243,26 @@ end.`);
       });
     });
 
+    it('parses local var declarations inside a subprogram body', () => {
+      const ast = parse(`
+program P;
+function sumTo(n: integer): integer;
+var
+  i, total: integer;
+begin
+  total := 0;
+  for i := 1 to n do total := total + i;
+  sumTo := total;
+end;
+begin
+  writeln(sumTo(5));
+end.`);
+      const fn: any = ast.declarations[0];
+      expect(fn.type).toBe('FunctionDeclaration');
+      expect(fn.body.declarations).toHaveLength(2);
+      expect(fn.body.declarations[0]).toMatchObject({ type: 'VariableDeclaration', name: 'i', varType: 'integer' });
+    });
+
     it('parses a procedure with a var (by-reference) parameter', () => {
       const ast = parse(`
 program P;

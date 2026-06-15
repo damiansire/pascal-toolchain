@@ -114,6 +114,24 @@ end.`);
         expect(output).toEqual([120]);
     });
 
+    it('runs a function with local variables', () => {
+        const output = run(`
+program LocalVars;
+function sumTo(n: integer): integer;
+var
+    i, total: integer;
+begin
+    total := 0;
+    for i := 1 to n do
+        total := total + i;
+    sumTo := total;
+end;
+begin
+    writeln(sumTo(5));
+end.`);
+        expect(output).toEqual([15]);
+    });
+
     it('runs a repeat..until loop', () => {
         const output = run(`
 program Countup;
