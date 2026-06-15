@@ -1,0 +1,74 @@
+import { compile } from '../codegen';
+
+/** Compiles Pascal, runs the generated JS, and returns everything logged. */
+function run(source: string): unknown[] {
+    const js = compile(source);
+    const logged: unknown[] = [];
+    const spy = jest.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+        logged.push(args.length === 1 ? args[0] : args);
+    });
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-new-func
+        new Function(js)();
+    } finally {
+        spy.mockRestore();
+    }
+    return logged;
+}
+
+describe('pascal-toolchain — full pipeline (Pascal source → running JS)', () => {
+    it('runs a program with variables and a for..to loop', () => {
+        const output = run(`
+program Sum;
+var
+    i, total: integer;
+begin
+    total := 0;
+    for i := 1 to 5 do
+        total := total + i;
+    writeln(total);
+end.`);
+        expect(output).toEqual([15]);
+    });
+
+    it('runs if/else with the mod operator', () => {
+        const output = run(`
+program Parity;
+var
+    n: integer;
+begin
+    n := 7;
+    if n mod 2 = 0 then
+        writeln('even')
+    else
+        writeln('odd');
+end.`);
+        expect(output).toEqual(['odd']);
+    });
+
+    it('runs a while loop with integer division (div)', () => {
+        const output = run(`
+program Halving;
+var
+    x: integer;
+begin
+    x := 8;
+    while x > 1 do
+        x := x div 2;
+    writeln(x);
+end.`);
+        expect(output).toEqual([1]);
+    });
+
+    it('respects operator precedence in arithmetic', () => {
+        const output = run(`
+program Math;
+var
+    r: integer;
+begin
+    r := 2 + 3 * 4;
+    writeln(r);
+end.`);
+        expect(output).toEqual([14]);
+    });
+});
