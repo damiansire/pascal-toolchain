@@ -4,9 +4,11 @@ Pending work, roughly in priority order. The toolchain already supports a usable
 procedural subset (see README); these extend it.
 
 ## Parser / language features
-- [ ] **Local variables** in procedures/functions — requires extending the `Block`
-      AST node to carry its own declarations (today subprograms only have parameters).
-- [ ] **Arrays** — `array[lo..hi] of T`, indexing, `for` over ranges.
+- [x] **Local variables** in procedures/functions (the `Block` AST node now carries
+      its own declarations). _Shipped in pascal-parser@0.2.0._
+- [x] **Arrays** — `array[lo..hi] of T`, indexing (1-based), assignment targets.
+      _Shipped in pascal-parser@0.2.0 / pascal-js-compiler@0.2.0._
+- [ ] **Multi-dimensional arrays** — `array[1..3, 1..3]`.
 - [ ] **Records** — `record ... end`, field access.
 - [ ] **Sets** — `set of`, `in` operator.
 - [ ] **More builtins** — `read`/`readln`, `length`, `inc`/`dec`, string helpers.

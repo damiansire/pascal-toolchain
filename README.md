@@ -41,6 +41,21 @@ npm run build       # build every package
 npm test            # run every package's tests
 ```
 
+## Supported Pascal subset
+
+The toolchain currently parses and compiles a usable procedural subset:
+
+- `program`, `const`, `var`, and `procedure` / `function` (with parameters, `var`
+  by-reference params, local declarations, and recursion)
+- statements: assignment (`:=`), `if/then/else`, `while`, `for..to/downto`,
+  `repeat..until`, `case..of`, `begin..end`, and procedure calls
+- expressions with full precedence, parentheses, and the operators
+  `+ - * /`, `div`, `mod`, `and`, `or`, `not`, and the relational set
+- one-dimensional **arrays** (`array[lo..hi] of T`) with 1-based indexing
+- `writeln` / `write` mapped to `console.log` / `process.stdout.write`
+
+See [`ROADMAP.md`](./ROADMAP.md) for what's next (records, multi-dim arrays, …).
+
 ## Releasing
 
 Versioning and publishing are handled with [Changesets](https://github.com/changesets/changesets);
