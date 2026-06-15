@@ -1,5 +1,7 @@
 # pascal-toolchain
 
+[![CI](https://github.com/damiansire/pascal-toolchain/actions/workflows/ci.yml/badge.svg)](https://github.com/damiansire/pascal-toolchain/actions/workflows/ci.yml)
+
 A **Pascal compiler frontend** written in TypeScript, organized as an npm-workspaces monorepo.
 Each stage is published as its own npm package, but they evolve together here.
 
