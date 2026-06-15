@@ -249,7 +249,34 @@ class CodeGenerator {
             return `${pad}${sink}(${payload});`;
         }
 
+        // inc(x[, n]) / dec(x[, n]) mutate their first argument.
+        if (name === 'inc' || name === 'dec') {
+            const op = name === 'inc' ? '+=' : '-=';
+            const amount = args.length > 1 ? args[1] : '1';
+            return `${pad}${args[0]} ${op} ${amount};`;
+        }
+
         return `${pad}${statement.name}(${args.join(', ')});`;
+    }
+
+    /** Maps Pascal builtin functions used in expressions to JavaScript. */
+    private genBuiltinCall(callee: string, args: string[]): string | null {
+        switch (callee.toLowerCase()) {
+            case 'abs':
+                return `Math.abs(${args[0]})`;
+            case 'sqrt':
+                return `Math.sqrt(${args[0]})`;
+            case 'sqr':
+                return `((${args[0]}) ** 2)`;
+            case 'trunc':
+                return `Math.trunc(${args[0]})`;
+            case 'round':
+                return `Math.round(${args[0]})`;
+            case 'odd':
+                return `((${args[0]}) % 2 !== 0)`;
+            default:
+                return null;
+        }
     }
 
     private genExpression(expression: Expression): string {
@@ -279,7 +306,9 @@ class CodeGenerator {
                 return (expression as BooleanLiteral).value ? 'true' : 'false';
             case 'CallExpression': {
                 const e = expression as CallExpression;
-                return `${e.callee}(${e.arguments.map((a) => this.genExpression(a)).join(', ')})`;
+                const args = e.arguments.map((a) => this.genExpression(a));
+                const builtin = this.genBuiltinCall(e.callee, args);
+                return builtin ?? `${e.callee}(${args.join(', ')})`;
             }
             case 'IndexExpression': {
                 const e = expression as IndexExpression;

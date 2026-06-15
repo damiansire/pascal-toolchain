@@ -131,6 +131,23 @@ end.`);
         expect(output).toEqual([55]);
     });
 
+    it('supports builtins: inc/dec (statements) and abs/sqr (expressions)', () => {
+        const output = run(`
+program Builtins;
+var
+    x: integer;
+begin
+    x := 5;
+    inc(x);
+    inc(x, 4);
+    dec(x, 3);
+    writeln(x);
+    writeln(abs(0 - 3));
+    writeln(sqr(4));
+end.`);
+        expect(output).toEqual([7, 3, 16]);
+    });
+
     it('runs a function with local variables', () => {
         const output = run(`
 program LocalVars;
