@@ -37,7 +37,7 @@ export interface Program extends ASTNode {
  * Represents a declaration in Pascal
  */
 export interface Declaration extends ASTNode {
-    type: 'VariableDeclaration' | 'FunctionDeclaration' | 'ProcedureDeclaration';
+    type: 'VariableDeclaration' | 'FunctionDeclaration' | 'ProcedureDeclaration' | 'ConstantDeclaration';
     name: string;
     // For variable declarations
     varType?: string;
@@ -45,6 +45,8 @@ export interface Declaration extends ASTNode {
     parameters?: Parameter[];
     returnType?: string;
     body?: Block;
+    // For constant declarations
+    value?: Expression;
 }
 
 /**
@@ -74,6 +76,7 @@ export interface Statement extends ASTNode {
     | 'IfStatement'
     | 'WhileStatement'
     | 'ForStatement'
+    | 'RepeatStatement'
     | 'CallStatement'
     | 'CompoundStatement';
 }
@@ -116,6 +119,15 @@ export interface ForStatement extends Statement {
     end: Expression;
     body: Statement;
     direction: 'to' | 'downto';
+}
+
+/**
+ * Represents a repeat..until statement (post-condition loop)
+ */
+export interface RepeatStatement extends Statement {
+    type: 'RepeatStatement';
+    body: Statement[];
+    condition: Expression;
 }
 
 /**

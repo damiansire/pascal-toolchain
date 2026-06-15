@@ -241,5 +241,28 @@ end.`);
                 parameters: [{ type: 'Parameter', name: 'x', paramType: 'integer', isVar: true }],
             });
         });
+
+        it('parses a const section', () => {
+            const ast = parse(`program P; const PI = 314; GREETING = 'hi'; begin writeln(PI); end.`);
+            expect(ast.declarations[0]).toMatchObject({
+                type: 'ConstantDeclaration',
+                name: 'PI',
+                value: { type: 'NumericLiteral', value: 314 },
+            });
+            expect(ast.declarations[1]).toMatchObject({
+                type: 'ConstantDeclaration',
+                name: 'GREETING',
+                value: { type: 'StringLiteral', value: 'hi' },
+            });
+        });
+
+        it('parses repeat..until loops', () => {
+            const ast = parse(`program P; var x: integer; begin x := 0; repeat x := x + 1 until x >= 3; end.`);
+            expect(ast.statements[1]).toMatchObject({
+                type: 'RepeatStatement',
+                condition: { type: 'BinaryExpression', operator: '>=' },
+            });
+            expect((ast.statements[1] as any).body).toHaveLength(1);
+        });
     });
 });

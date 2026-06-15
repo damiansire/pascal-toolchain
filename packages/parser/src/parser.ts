@@ -9,6 +9,7 @@ import {
     IfStatement,
     WhileStatement,
     ForStatement,
+    RepeatStatement,
     CallStatement,
     CompoundStatement,
     Expression,
@@ -130,12 +131,32 @@ class Parser {
 
     private parseDeclarations(): Declaration[] {
         const declarations: Declaration[] = [];
-        while (this.checkKeyword('var') || this.checkKeyword('procedure') || this.checkKeyword('function')) {
+        while (
+            this.checkKeyword('var') ||
+            this.checkKeyword('const') ||
+            this.checkKeyword('procedure') ||
+            this.checkKeyword('function')
+        ) {
             if (this.checkKeyword('var')) {
                 declarations.push(...this.parseVarSection());
+            } else if (this.checkKeyword('const')) {
+                declarations.push(...this.parseConstSection());
             } else {
                 declarations.push(this.parseSubprogram());
             }
+        }
+        return declarations;
+    }
+
+    private parseConstSection(): Declaration[] {
+        this.consumeKeyword('const', "Expected 'const'");
+        const declarations: Declaration[] = [];
+        while (this.check('IDENTIFIER')) {
+            const name = this.consume('IDENTIFIER', 'Expected constant name').value;
+            this.consume('OPERATOR_EQUAL', "Expected '=' in constant declaration");
+            const value = this.parseExpression();
+            this.consume('DELIMITER_SEMICOLON', "Expected ';' after constant declaration");
+            declarations.push({ type: 'ConstantDeclaration', name, value, location: this.location() });
         }
         return declarations;
     }
@@ -237,6 +258,7 @@ class Parser {
         if (this.checkKeyword('if')) return this.parseIf();
         if (this.checkKeyword('while')) return this.parseWhile();
         if (this.checkKeyword('for')) return this.parseFor();
+        if (this.checkKeyword('repeat')) return this.parseRepeat();
         if (this.check('IDENTIFIER')) return this.parseIdentifierStatement();
         throw new ParseError(`Unexpected token in statement: '${this.peek().value}'`);
     }
@@ -259,6 +281,19 @@ class Parser {
             elseBranch = this.parseStatement();
         }
         return { type: 'IfStatement', condition, thenBranch, elseBranch, location: this.location() };
+    }
+
+    private parseRepeat(): RepeatStatement {
+        this.consumeKeyword('repeat', "Expected 'repeat'");
+        const body: Statement[] = [this.parseStatement()];
+        // Statements are `;`-separated; the one before `until` may omit it.
+        while (this.match('DELIMITER_SEMICOLON')) {
+            if (this.checkKeyword('until')) break;
+            body.push(this.parseStatement());
+        }
+        this.consumeKeyword('until', "Expected 'until'");
+        const condition = this.parseExpression();
+        return { type: 'RepeatStatement', body, condition, location: this.location() };
     }
 
     private parseWhile(): WhileStatement {

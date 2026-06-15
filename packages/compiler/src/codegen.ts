@@ -18,6 +18,7 @@ import {
     IfStatement,
     WhileStatement,
     ForStatement,
+    RepeatStatement,
     CallStatement,
     CompoundStatement,
     Expression,
@@ -90,6 +91,10 @@ class CodeGenerator {
             case 'VariableDeclaration': {
                 const typeComment = declaration.varType ? ` // ${declaration.varType}` : '';
                 return [`${pad}let ${declaration.name};${typeComment}`];
+            }
+            case 'ConstantDeclaration': {
+                const value = declaration.value ? this.genExpression(declaration.value) : 'undefined';
+                return [`${pad}const ${declaration.name} = ${value};`];
             }
             case 'ProcedureDeclaration': {
                 const params = (declaration.parameters ?? []).map((p) => p.name).join(', ');
@@ -177,6 +182,14 @@ class CodeGenerator {
                 ];
                 lines.push(...this.genBody(s.body, level + 1));
                 lines.push(`${pad}}`);
+                return lines;
+            }
+            case 'RepeatStatement': {
+                const s = statement as RepeatStatement;
+                const lines = [`${pad}do {`];
+                for (const inner of s.body) lines.push(...this.genStatement(inner, level + 1));
+                // repeat..until loops *until* the condition holds → while not condition.
+                lines.push(`${pad}} while (!(${this.genExpression(s.condition)}));`);
                 return lines;
             }
             case 'CompoundStatement': {

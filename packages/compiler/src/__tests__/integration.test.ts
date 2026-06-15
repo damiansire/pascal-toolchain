@@ -113,4 +113,34 @@ begin
 end.`);
         expect(output).toEqual([120]);
     });
+
+    it('runs a repeat..until loop', () => {
+        const output = run(`
+program Countup;
+var
+    x: integer;
+begin
+    x := 0;
+    repeat
+        x := x + 1
+    until x >= 3;
+    writeln(x);
+end.`);
+        expect(output).toEqual([3]);
+    });
+
+    it('uses const declarations', () => {
+        const output = run(`
+program Area;
+const
+    PI = 3;
+var
+    r, area: integer;
+begin
+    r := 2;
+    area := PI * r * r;
+    writeln(area);
+end.`);
+        expect(output).toEqual([12]);
+    });
 });
