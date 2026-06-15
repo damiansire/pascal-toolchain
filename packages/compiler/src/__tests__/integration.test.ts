@@ -143,4 +143,21 @@ begin
 end.`);
         expect(output).toEqual([12]);
     });
+
+    it('runs a case..of statement (with else)', () => {
+        const output = run(`
+program Classify;
+var
+    n: integer;
+begin
+    n := 3;
+    case n of
+        1: writeln('one');
+        2, 3: writeln('two or three');
+    else
+        writeln('other');
+    end;
+end.`);
+        expect(output).toEqual(['two or three']);
+    });
 });

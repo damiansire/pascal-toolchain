@@ -264,5 +264,24 @@ end.`);
             });
             expect((ast.statements[1] as any).body).toHaveLength(1);
         });
+
+        it('parses case..of with multiple labels and an else branch', () => {
+            const ast = parse(`
+program P;
+var n: integer;
+begin
+    case n of
+        1: writeln('one');
+        2, 3: writeln('two or three');
+    else
+        writeln('other');
+    end;
+end.`);
+            const caseStmt: any = ast.statements[0];
+            expect(caseStmt.type).toBe('CaseStatement');
+            expect(caseStmt.clauses).toHaveLength(2);
+            expect(caseStmt.clauses[1].labels).toHaveLength(2);
+            expect(caseStmt.elseBranch).toMatchObject({ type: 'CallStatement', name: 'writeln' });
+        });
     });
 });

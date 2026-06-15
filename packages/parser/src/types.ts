@@ -77,6 +77,7 @@ export interface Statement extends ASTNode {
     | 'WhileStatement'
     | 'ForStatement'
     | 'RepeatStatement'
+    | 'CaseStatement'
     | 'CallStatement'
     | 'CompoundStatement';
 }
@@ -128,6 +129,24 @@ export interface RepeatStatement extends Statement {
     type: 'RepeatStatement';
     body: Statement[];
     condition: Expression;
+}
+
+/**
+ * A single branch of a case statement: one or more labels and a body.
+ */
+export interface CaseClause {
+    labels: Expression[];
+    body: Statement;
+}
+
+/**
+ * Represents a case..of statement (multi-way branch)
+ */
+export interface CaseStatement extends Statement {
+    type: 'CaseStatement';
+    expression: Expression;
+    clauses: CaseClause[];
+    elseBranch?: Statement;
 }
 
 /**

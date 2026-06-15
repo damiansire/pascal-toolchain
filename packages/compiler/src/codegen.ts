@@ -19,6 +19,7 @@ import {
     WhileStatement,
     ForStatement,
     RepeatStatement,
+    CaseStatement,
     CallStatement,
     CompoundStatement,
     Expression,
@@ -190,6 +191,23 @@ class CodeGenerator {
                 for (const inner of s.body) lines.push(...this.genStatement(inner, level + 1));
                 // repeat..until loops *until* the condition holds → while not condition.
                 lines.push(`${pad}} while (!(${this.genExpression(s.condition)}));`);
+                return lines;
+            }
+            case 'CaseStatement': {
+                const s = statement as CaseStatement;
+                const lines = [`${pad}switch (${this.genExpression(s.expression)}) {`];
+                for (const clause of s.clauses) {
+                    for (const label of clause.labels) {
+                        lines.push(`${this.pad(level + 1)}case ${this.genExpression(label)}:`);
+                    }
+                    lines.push(...this.genBody(clause.body, level + 2));
+                    lines.push(`${this.pad(level + 2)}break;`);
+                }
+                if (s.elseBranch) {
+                    lines.push(`${this.pad(level + 1)}default:`);
+                    lines.push(...this.genBody(s.elseBranch, level + 2));
+                }
+                lines.push(`${pad}}`);
                 return lines;
             }
             case 'CompoundStatement': {

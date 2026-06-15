@@ -10,6 +10,8 @@ import {
     WhileStatement,
     ForStatement,
     RepeatStatement,
+    CaseStatement,
+    CaseClause,
     CallStatement,
     CompoundStatement,
     Expression,
@@ -259,6 +261,7 @@ class Parser {
         if (this.checkKeyword('while')) return this.parseWhile();
         if (this.checkKeyword('for')) return this.parseFor();
         if (this.checkKeyword('repeat')) return this.parseRepeat();
+        if (this.checkKeyword('case')) return this.parseCase();
         if (this.check('IDENTIFIER')) return this.parseIdentifierStatement();
         throw new ParseError(`Unexpected token in statement: '${this.peek().value}'`);
     }
@@ -294,6 +297,35 @@ class Parser {
         this.consumeKeyword('until', "Expected 'until'");
         const condition = this.parseExpression();
         return { type: 'RepeatStatement', body, condition, location: this.location() };
+    }
+
+    private parseCase(): CaseStatement {
+        this.consumeKeyword('case', "Expected 'case'");
+        const expression = this.parseExpression();
+        this.consumeKeyword('of', "Expected 'of' after case expression");
+
+        const clauses: CaseClause[] = [];
+        while (!this.checkKeyword('end') && !this.checkKeyword('else')) {
+            const labels = [this.parseExpression()];
+            while (this.match('DELIMITER_COMMA')) {
+                labels.push(this.parseExpression());
+            }
+            this.consume('DELIMITER_COLON', "Expected ':' in case clause");
+            const body = this.parseStatement();
+            clauses.push({ labels, body });
+            if (this.checkKeyword('end') || this.checkKeyword('else')) break;
+            this.consume('DELIMITER_SEMICOLON', "Expected ';' between case clauses");
+        }
+
+        let elseBranch: Statement | undefined;
+        if (this.checkKeyword('else')) {
+            this.advance();
+            elseBranch = this.parseStatement();
+            this.match('DELIMITER_SEMICOLON');
+        }
+
+        this.consumeKeyword('end', "Expected 'end' to close case statement");
+        return { type: 'CaseStatement', expression, clauses, elseBranch, location: this.location() };
     }
 
     private parseWhile(): WhileStatement {
