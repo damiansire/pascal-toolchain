@@ -1,0 +1,54 @@
+{
+  "name": "pascal-code-formatter",
+  "version": "0.0.4",
+  "description": "A Pascal code formatter written in TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "pascal",
+    "formatter",
+    "code",
+    "tokenizer",
+    "typescript",
+    "javascript"
+  ],
+  "author": "Damian damiansirecontacto@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.19",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "counterweight-stack": "^0.0.1",
+    "objects-deep-compare": "^0.0.1",
+    "pascal-tokenizer": "^0.0.3"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/damiansire/pascal-code-formatter.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/damiansire/pascal-code-formatter/issues"
+  },
+  "homepage": "https://github.com/damiansire/pascal-code-formatter#readme",
+  "files": [
+    "dist"
+  ]
+}
