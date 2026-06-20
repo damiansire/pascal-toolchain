@@ -1,15 +1,9 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs",
-    "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true
+    "rootDir": "./src"
   },
-  "include": ["*.ts", "src/tokenizer.ts", "src/index.ts", "src/example.ts"],
+  "include": ["src/tokenizer.ts", "src/index.ts", "src/example.ts"],
   "exclude": ["node_modules", "dist"]
 }

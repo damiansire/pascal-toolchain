@@ -1,6 +1,6 @@
 import { PascalToken } from "pascal-tokenizer";
 import { InternalFormattedPascalLine } from "../shared/types";
-import { EmptyLine, WhiteSpace } from "../shared/elements";
+import { WhiteSpace } from "../shared/elements";
 import { IdentationManager } from "./identation-manager";
 import { isEndOfLine, needWhiteSpace } from "../shared/libs";
 
@@ -15,14 +15,13 @@ class FormatterController {
     this.indentationManager = new IdentationManager();
 
     for (let index = 0; index < tokens.length; index++) {
-      const prevToken = tokens[index - 1];
       const currentToken = tokens[index];
       const nextToken = tokens[index + 1];
-      this.processToken(prevToken, currentToken, nextToken);
+      this.processToken(currentToken, nextToken);
     }
   }
 
-  private processToken(prevToken: PascalToken, currentToken: PascalToken, nextToken: PascalToken) {
+  private processToken(currentToken: PascalToken, nextToken: PascalToken) {
     this.addTokenToCurrentLine(currentToken);
 
     const addWhiteSpace = needWhiteSpace(currentToken, nextToken);

@@ -157,7 +157,7 @@ const getLineType = (tokens: PascalToken[]): LineType => {
   return "UNKNOWN";
 }
 
-const needAddEmptyLine = (history: CounterweightStack<StructuralType>, prevLine: FormattedPascalLine | undefined, currentLine: FormattedPascalLine) => {
+const needAddEmptyLine = (_history: CounterweightStack<StructuralType>, prevLine: FormattedPascalLine | undefined, currentLine: FormattedPascalLine) => {
   if (!prevLine) {
     return false;
   }
