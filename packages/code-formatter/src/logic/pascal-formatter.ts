@@ -22,7 +22,6 @@ class PascalFormatter {
   }
 
   format(): FormattedPascalLine[] {
-    debugger
     const formattedLines = this.formatterController.getFormattedLines();
     if (formattedLines.length === 0) {
       return []
