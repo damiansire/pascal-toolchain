@@ -4,6 +4,21 @@
   "description": "A Pascal language parser library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/damiansire/pascal-toolchain.git",
+    "directory": "packages/parser"
+  },
   "files": [
     "dist",
     "README.md"
@@ -26,7 +41,7 @@
     "parser",
     "typescript"
   ],
-  "author": "",
+  "author": "Damian Sire",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.12",

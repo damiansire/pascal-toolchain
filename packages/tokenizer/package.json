@@ -4,6 +4,16 @@
   "description": "A tokenizer for Pascal programming language",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest --coverage",
@@ -12,12 +22,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/damiansire/pascal-tokenizer.git"
+    "url": "git+https://github.com/damiansire/pascal-toolchain.git",
+    "directory": "packages/tokenizer"
   },
   "bugs": {
-    "url": "https://github.com/damiansire/pascal-tokenizer/issues"
+    "url": "https://github.com/damiansire/pascal-toolchain/issues"
   },
-  "homepage": "https://github.com/damiansire/pascal-tokenizer#readme",
+  "homepage": "https://github.com/damiansire/pascal-toolchain/tree/main/packages/tokenizer#readme",
   "keywords": [
     "pascal",
     "tokenizer",
