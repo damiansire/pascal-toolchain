@@ -26,10 +26,10 @@ const isEndOfLine = (currentToken: PascalToken, nextToken: PascalToken): boolean
     return true;
   }
   if (currentToken.type === "KEYWORD") {
-    if (["begin", "var", "else"].includes(currentToken.value)) {
+    if (["begin", "var", "else"].includes(currentToken.value.toLowerCase())) {
       return true;
     }
-    if (currentToken.value === "end") {
+    if (currentToken.value.toLowerCase() === "end") {
       if (nextToken.value !== "." && nextToken.value !== ";") {
         return true;
       }
@@ -109,46 +109,47 @@ const getStructuralType = (lineType: LineType, typeStack: CounterweightStack<Str
 }
 
 const getLineType = (tokens: PascalToken[]): LineType => {
-  if (tokens.some(token => token.value === "program")) {
+  const has = (value: string) => tokens.some(token => token.value.toLowerCase() === value);
+  if (has("program")) {
     return "PROGRAM_NAME_DECLARATION";
   }
-  if (tokens.some(token => token.value === ":=")) {
+  if (has(":=")) {
     return "ASSIGNMENT";
   }
-  if (tokens.some(token => token.value === "if")) {
+  if (has("if")) {
     return "IF_STATEMENT";
   }
-  if (tokens.some(token => token.value === "while")) {
+  if (has("while")) {
     return "WHILE_STATEMENT";
   }
-  if (tokens.some(token => token.value === "repeat")) {
+  if (has("repeat")) {
     return "REPEAT_STATEMENT";
   }
-  if (tokens.some(token => token.value === "for")) {
+  if (has("for")) {
     return "FOR_STATEMENT";
   }
-  if (tokens.some(token => token.value === "var")) {
+  if (has("var")) {
     return "VAR_DECLARATION";
   }
-  if (tokens.some(token => token.value === "begin")) {
+  if (has("begin")) {
     return "BEGIN_DECLARATION";
   }
-  if (tokens.some(token => token.value === "end")) {
+  if (has("end")) {
     return "END_DECLARATION";
   }
-  if (tokens.some(token => token.value === "procedure")) {
+  if (has("procedure")) {
     return "PROCEDURE_DEFINITION";
   }
-  if (tokens.some(token => token.value === "function")) {
+  if (has("function")) {
     return "FUNCTION_DEFINITION";
   }
-  if (tokens.some(token => token.value === "const")) {
+  if (has("const")) {
     return "CONST_DECLARATION";
   }
-  if (tokens.some(token => token.value === "type")) {
+  if (has("type")) {
     return "TYPE_DECLARATION";
   }
-  if (tokens.some(token => token.value === ":")) {
+  if (has(":")) {
     return "DECLARATION";
   }
   if (tokens.length === 0) {
