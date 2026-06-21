@@ -285,16 +285,30 @@ class CodeGenerator {
         switch (expression.type) {
             case 'BinaryExpression': {
                 const e = expression as BinaryExpression;
+                const op = e.operator.toLowerCase();
+                // and/or are lowered to the boolean operators &&/||. Pascal also overloads
+                // them bitwise over integers ('12 and 10' = 8), which this subset does NOT
+                // support; reject clearly-integer operands instead of emitting wrong logic.
+                if ((op === 'and' || op === 'or') && (this.isIntegerExpression(e.left) || this.isIntegerExpression(e.right))) {
+                    throw new Error(
+                        `Bitwise '${op}' over integers is not supported; only boolean '${op}' is.`,
+                    );
+                }
                 const left = this.genExpression(e.left);
                 const right = this.genExpression(e.right);
                 // Pascal integer division has no direct JS operator.
-                if (e.operator.toLowerCase() === 'div') {
+                if (op === 'div') {
                     return `Math.trunc(${left} / ${right})`;
                 }
                 return `(${left} ${this.mapBinary(e.operator)} ${right})`;
             }
             case 'UnaryExpression': {
                 const e = expression as UnaryExpression;
+                // 'not' is lowered to '!'. Pascal's bitwise 'not' over integers ('not 0' = -1)
+                // is not supported by this boolean-only subset; reject clearly-integer operands.
+                if (e.operator.toLowerCase() === 'not' && this.isIntegerExpression(e.argument)) {
+                    throw new Error("Bitwise 'not' over integers is not supported; only boolean 'not' is.");
+                }
                 return `(${this.mapUnary(e.operator)}${this.genExpression(e.argument)})`;
             }
             case 'Identifier':
@@ -327,6 +341,33 @@ class CodeGenerator {
             default:
                 throw new Error(`Unsupported expression: ${expression.type}`);
         }
+    }
+
+    /**
+     * Conservatively decides whether an expression is *clearly* an integer, so that
+     * applying and/or/not to it would be a bitwise (unsupported) rather than boolean
+     * operation. Only returns true for cases with no boolean reading at all; anything
+     * ambiguous (identifiers, calls) returns false to avoid rejecting valid boolean code.
+     */
+    private isIntegerExpression(expression: Expression): boolean {
+        if (expression.type === 'NumericLiteral') {
+            return Number.isInteger((expression as NumericLiteral).value);
+        }
+        if (expression.type === 'BinaryExpression') {
+            const e = expression as BinaryExpression;
+            const arithmetic = new Set(['+', '-', '*', 'div', 'mod']);
+            if (arithmetic.has(e.operator.toLowerCase())) {
+                return this.isIntegerExpression(e.left) && this.isIntegerExpression(e.right);
+            }
+            return false;
+        }
+        if (expression.type === 'UnaryExpression') {
+            const e = expression as UnaryExpression;
+            const op = e.operator.toLowerCase();
+            if (op === '-' || op === '+') return this.isIntegerExpression(e.argument);
+            return false;
+        }
+        return false;
     }
 
     private mapBinary(operator: string): string {

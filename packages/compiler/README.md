@@ -47,6 +47,8 @@ The generator targets the full parser AST contract:
 - statements: assignment (`:=` → `=`), `if/else`, `while`, `for..to` / `for..downto`, calls
 - expressions: binary/unary operators, identifiers, numeric/string/boolean literals
 - operator mapping: `=` → `===`, `<>` → `!==`, `div` → `Math.trunc`, `mod` → `%`, `and/or/not` → `&&/||/!`
+  (boolean operands only — Pascal's bitwise `and/or/not` over integers is **not** supported; the
+  compiler raises an error on a clearly-integer operand rather than emit incorrect logic)
 - I/O builtins: `writeln` → `console.log`, `write` → `process.stdout.write`
 
 > The accepted Pascal grammar is bounded by what `pascal-parser` currently parses.

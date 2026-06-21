@@ -50,7 +50,8 @@ The toolchain currently parses and compiles a usable procedural subset:
 - statements: assignment (`:=`), `if/then/else`, `while`, `for..to/downto`,
   `repeat..until`, `case..of`, `begin..end`, and procedure calls
 - expressions with full precedence, parentheses, and the operators
-  `+ - * /`, `div`, `mod`, `and`, `or`, `not`, and the relational set
+  `+ - * /`, `div`, `mod`, `and`, `or`, `not` (boolean operands only — the bitwise
+  integer overload of `and`/`or`/`not` is not supported), and the relational set
 - one-dimensional **arrays** (`array[lo..hi] of T`) with 1-based indexing
 - `writeln` / `write` mapped to `console.log` / `process.stdout.write`
 
