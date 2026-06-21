@@ -147,6 +147,26 @@ describe("tokenizePascal", () => {
     ]);
   });
 
+  it("should treat a trailing dot as a delimiter, not a real number ('5.')", () => {
+    // ISO Pascal: '5.' is the integer 5 followed by '.', not the real 5.0.
+    const tokens = tokenizePascal("5.");
+    const relevant = tokens.filter((t) => t.type !== "EOF");
+    expect(relevant).toEqual([
+      { type: "NUMBER_INTEGER", value: "5" },
+      { type: "DELIMITER_DOT", value: "." },
+    ]);
+  });
+
+  it("should tokenize an integer immediately followed by a range operator ('5..10')", () => {
+    const tokens = tokenizePascal("5..10");
+    const relevant = tokens.filter((t) => t.type !== "EOF");
+    expect(relevant).toEqual([
+      { type: "NUMBER_INTEGER", value: "5" },
+      { type: "OPERATOR_RANGE", value: ".." },
+      { type: "NUMBER_INTEGER", value: "10" },
+    ]);
+  });
+
   // Comillas escapadas dentro de un string literal
   it("should handle escaped quotes inside a string literal", () => {
     const tokens = tokenizePascal("s := 'it''s ok';");
