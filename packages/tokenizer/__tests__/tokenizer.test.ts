@@ -108,6 +108,77 @@ describe("tokenizePascal", () => {
     expect(tokenizePascal(code)).toEqual([{ type: "EOF", value: "" }]);
   });
 
+  // Operadores compuestos y de rango
+  it("should tokenize compound operators and the range operator", () => {
+    const code = "a <= b >= c <> d .. e";
+    const tokens = tokenizePascal(code);
+    const compoundTokens = tokens.filter((t) => t.type.startsWith("OPERATOR_"));
+    expect(compoundTokens).toEqual([
+      { type: "OPERATOR_LESS_EQUAL", value: "<=" },
+      { type: "OPERATOR_GREATER_EQUAL", value: ">=" },
+      { type: "OPERATOR_NOT_EQUAL", value: "<>" },
+      { type: "OPERATOR_RANGE", value: ".." },
+    ]);
+  });
+
+  // Operadores de puntero y dirección
+  it("should tokenize pointer (^) and address-of (@) operators", () => {
+    const tokens = tokenizePascal("p^ := @x;");
+    const ptrTokens = tokens.filter(
+      (t) => t.type === "OPERATOR_POINTER" || t.type === "OPERATOR_ADDRESSOF"
+    );
+    expect(ptrTokens).toEqual([
+      { type: "OPERATOR_POINTER", value: "^" },
+      { type: "OPERATOR_ADDRESSOF", value: "@" },
+    ]);
+  });
+
+  // Reales que empiezan con punto y manejo del rango pegado a un entero
+  it("should tokenize a real starting with a dot and an integer range", () => {
+    const tokens = tokenizePascal("x := .5; y := 1..10;");
+    const numericAndRange = tokens.filter(
+      (t) => t.type.startsWith("NUMBER_") || t.type === "OPERATOR_RANGE"
+    );
+    expect(numericAndRange).toEqual([
+      { type: "NUMBER_REAL", value: ".5" },
+      { type: "NUMBER_INTEGER", value: "1" },
+      { type: "OPERATOR_RANGE", value: ".." },
+      { type: "NUMBER_INTEGER", value: "10" },
+    ]);
+  });
+
+  // Comillas escapadas dentro de un string literal
+  it("should handle escaped quotes inside a string literal", () => {
+    const tokens = tokenizePascal("s := 'it''s ok';");
+    const stringToken = tokens.find((t) => t.type === "STRING_LITERAL");
+    expect(stringToken).toEqual({ type: "STRING_LITERAL", value: "it's ok" });
+  });
+
+  // Rutas de error: el lexer debe fallar con línea y columna, no continuar
+  it("should throw on an unclosed brace comment", () => {
+    expect(() => tokenizePascal("{ never closed")).toThrow(
+      /Unclosed '\{' comment at line 1, column 1/
+    );
+  });
+
+  it("should throw on an unclosed (* *) comment", () => {
+    expect(() => tokenizePascal("(* never closed")).toThrow(
+      /Unclosed '\(\*' comment at line 1, column 1/
+    );
+  });
+
+  it("should throw on an unclosed string literal", () => {
+    expect(() => tokenizePascal("x := 'oops")).toThrow(
+      /Unclosed string literal at line 1, column 6/
+    );
+  });
+
+  it("should throw on an unknown character", () => {
+    expect(() => tokenizePascal("a := 3 $ 4")).toThrow(
+      /Unknown character '\$' at line 1, column 8/
+    );
+  });
+
   it("To complex code", () => {
     const code = `
       program MiPrimerPrograma;

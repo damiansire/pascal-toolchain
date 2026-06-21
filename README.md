@@ -14,11 +14,11 @@ source.pas
 ┌──────────────────┐  tokens  ┌───────────────┐   AST   ┌────────────────────┐  JS
 │ pascal-tokenizer │ ───────▶ │ pascal-parser │ ──────▶ │ pascal-js-compiler │ ────▶ output.js
 └──────────────────┘          └───────────────┘         └────────────────────┘
-                                      │ AST
-                                      ▼
-                            ┌────────────────────────┐
-                            │ pascal-code-formatter   │ ──▶ pretty Pascal
-                            └────────────────────────┘
+   │ tokens
+   ▼
+┌────────────────────────┐
+│ pascal-code-formatter   │ ──▶ pretty Pascal
+└────────────────────────┘
 ```
 
 ## Packages
