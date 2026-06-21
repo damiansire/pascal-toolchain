@@ -21,15 +21,22 @@
     "test:types": "npm run test:types --workspaces --if-present",
     "size": "size-limit",
     "clean": "npm run clean --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",
+    "@eslint/js": "^9.13.0",
     "@size-limit/preset-small-lib": "^12.1.0",
+    "eslint": "^9.13.0",
+    "prettier": "^3.3.0",
     "size-limit": "^12.1.0",
     "tsd": "^0.33.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.13.0"
   }
 }
