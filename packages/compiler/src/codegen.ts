@@ -69,13 +69,39 @@ class CodeGenerator {
     private currentFunction: string | null = null;
     /** Low bound of each declared array, to offset Pascal indices to 0-based JS. */
     private arrayLowBounds = new Map<string, number>();
+    /**
+     * Canonical (lower-case) names of every subprogram the user declared. Pascal is
+     * case-insensitive, so a user `function Abs(...)` must win over the `Math.abs`
+     * builtin: a builtin rewrite is applied ONLY when the callee is not in this set.
+     */
+    private userSubprograms = new Set<string>();
+    /** Monotonic counter naming each `for` loop's hoisted bound temp uniquely (per program). */
+    private forCounter = 0;
 
     constructor(options: CompileOptions = {}) {
         this.indentUnit = options.indent ?? '  ';
     }
 
+    /** Recursively collects declared function/procedure names (including nested ones). */
+    private collectSubprograms(declarations: readonly Declaration[]): void {
+        for (const declaration of declarations) {
+            if (
+                declaration.type === 'FunctionDeclaration' ||
+                declaration.type === 'ProcedureDeclaration'
+            ) {
+                this.userSubprograms.add(declaration.name.toLowerCase());
+                if (declaration.body?.declarations) {
+                    this.collectSubprograms(declaration.body.declarations);
+                }
+            }
+        }
+    }
+
     generate(program: Program): string {
         this.arrayLowBounds = new Map();
+        this.userSubprograms = new Set();
+        this.forCounter = 0;
+        this.collectSubprograms(program.declarations);
         const lines: string[] = [`// Generated from Pascal program: ${program.name}`];
         for (const declaration of program.declarations) {
             lines.push(...this.genDeclaration(declaration, 0));
@@ -209,11 +235,15 @@ class CodeGenerator {
                 const v = this.genExpression(s.variable);
                 const op = s.direction === 'to' ? '<=' : '>=';
                 const step = s.direction === 'to' ? '++' : '--';
-                const lines = [
-                    `${pad}for (let ${v} = ${this.genExpression(s.start)}; ${v} ${op} ${this.genExpression(
-                        s.end,
-                    )}; ${v}${step}) {`,
-                ];
+                // Pascal's `for` reuses the already-declared control variable (so its
+                // value survives the loop) and evaluates the bound exactly once. Hoist
+                // the limit to a temp ('$' can't appear in a Pascal identifier, so it
+                // never collides with a user name) and reuse the variable (no `let`).
+                const limit = `$end${this.forCounter++}`;
+                const lines = [`${pad}const ${limit} = ${this.genExpression(s.end)};`];
+                lines.push(
+                    `${pad}for (${v} = ${this.genExpression(s.start)}; ${v} ${op} ${limit}; ${v}${step}) {`,
+                );
                 lines.push(...this.genBody(s.body, level + 1));
                 lines.push(`${pad}}`);
                 return lines;
@@ -259,6 +289,12 @@ class CodeGenerator {
         const name = statement.name.toLowerCase();
         const args = statement.arguments.map((a) => this.genExpression(a));
 
+        // A user-declared procedure/function with a builtin's name shadows the
+        // builtin (Pascal is case-insensitive): emit a plain user call instead.
+        if (this.userSubprograms.has(name)) {
+            return `${pad}${this.mapIdentifier(statement.name)}(${args.join(', ')});`;
+        }
+
         if (name === 'writeln' || name === 'write') {
             const sink = name === 'writeln' ? 'console.log' : 'process.stdout.write';
             if (args.length === 0) return `${pad}${sink}('');`;
@@ -281,18 +317,37 @@ class CodeGenerator {
 
     /** Maps Pascal builtin functions used in expressions to JavaScript. */
     private genBuiltinCall(callee: string, args: string[]): string | null {
-        switch (callee.toLowerCase()) {
+        const name = callee.toLowerCase();
+        // A user-declared subprogram with this name shadows the builtin.
+        if (this.userSubprograms.has(name)) return null;
+
+        // All supported builtins are unary; reject wrong arity instead of emitting
+        // Math.abs(undefined) → NaN or silently dropping extra arguments.
+        const requireUnary = () => {
+            if (args.length !== 1) {
+                throw new Error(
+                    `Builtin '${name}' expects exactly 1 argument, got ${args.length}.`,
+                );
+            }
+        };
+        switch (name) {
             case 'abs':
+                requireUnary();
                 return `Math.abs(${args[0]})`;
             case 'sqrt':
+                requireUnary();
                 return `Math.sqrt(${args[0]})`;
             case 'sqr':
+                requireUnary();
                 return `((${args[0]}) ** 2)`;
             case 'trunc':
+                requireUnary();
                 return `Math.trunc(${args[0]})`;
             case 'round':
+                requireUnary();
                 return `Math.round(${args[0]})`;
             case 'odd':
+                requireUnary();
                 return `((${args[0]}) % 2 !== 0)`;
             default:
                 return null;
