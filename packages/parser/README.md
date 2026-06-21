@@ -6,7 +6,8 @@ A TypeScript library for parsing Pascal language code into an Abstract Syntax Tr
 
 - **Lexical Analysis**: Tokenizes Pascal source code into a stream of tokens
 - **Syntax Analysis**: Parses tokens into an Abstract Syntax Tree (AST)
-- **Error Handling**: Detailed error reporting with source locations
+- **Error Handling**: Throws a typed `ParseError` with a descriptive message on
+  invalid input (source-location tracking is not yet implemented; see below)
 - **TypeScript Support**: Full type definitions for all AST nodes
 - **Comprehensive Testing**: Extensive test coverage for grammar rules
 - **Well-documented API**: Detailed documentation with examples
@@ -38,7 +39,7 @@ try {
   console.log(JSON.stringify(ast, null, 2));
 } catch (error) {
   if (error instanceof ParseError) {
-    console.error(`Parse error at line ${error.location?.start.line}: ${error.message}`);
+    console.error(`Parse error: ${error.message}`);
   }
 }
 ```
@@ -51,10 +52,6 @@ The parser generates an Abstract Syntax Tree (AST) that represents the structura
 // For the code: x := 5 + 2;
 {
   type: 'AssignmentStatement',
-  location: {
-    start: { line: 1, column: 1, offset: 0 },
-    end: { line: 1, column: 12, offset: 11 }
-  },
   left: {
     type: 'Identifier',
     name: 'x'
@@ -137,18 +134,23 @@ For a complete grammar specification, see the [Grammar Documentation](docs/gramm
 
 ## Error Handling
 
-The parser provides detailed error reporting:
+On invalid input the parser throws a typed `ParseError` with a descriptive
+message:
 
 ```typescript
 try {
   parse('program Test; begin x := ; end.');
 } catch (error) {
   if (error instanceof ParseError) {
-    console.error(`Parse error at line ${error.location?.start.line}: ${error.message}`);
-    // Output: Parse error at line 1: Expected expression after assignment operator
+    console.error(`Parse error: ${error.message}`);
+    // Output: Parse error: Unexpected token in expression: ';'
   }
 }
 ```
+
+> Source-location tracking is not yet implemented: `ParseError.location` is
+> currently `undefined` and AST nodes carry a zeroed `location`. This is on the
+> roadmap.
 
 ## Contributing
 
