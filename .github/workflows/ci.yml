@@ -23,6 +23,12 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Lint
+        run: npm run lint -- --max-warnings 0
+
+      - name: Format check
+        run: npm run format:check
+
       - name: Build (ordered across packages)
         run: npm run build
 

@@ -29,8 +29,22 @@ jobs:
       - name: Install
         run: npm ci
 
+      # Never publish an artifact this pipeline did not verify. Gate the publish
+      # on the same checks CI runs: lint, format, build, tests and type-tests.
+      - name: Lint
+        run: npm run lint -- --max-warnings 0
+
+      - name: Format check
+        run: npm run format:check
+
       - name: Build
         run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Type-tests (public API)
+        run: npm run test:types
 
       - name: Create Release PR or publish
         uses: changesets/action@v1
