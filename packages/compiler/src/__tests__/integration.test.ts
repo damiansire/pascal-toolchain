@@ -8,7 +8,6 @@ function run(source: string): unknown[] {
         logged.push(args.length === 1 ? args[0] : args);
     });
     try {
-        // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-new-func
         new Function(js)();
     } finally {
         spy.mockRestore();
