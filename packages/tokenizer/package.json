@@ -43,7 +43,7 @@
   "author": "Damian Sire",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^4.9.5"
+    "typescript": "^5.6.3"
   },
   "files": [
     "dist"
