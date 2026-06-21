@@ -45,8 +45,10 @@ npm test            # run every package's tests
 
 The toolchain currently parses and compiles a usable procedural subset:
 
-- `program`, `const`, `var`, and `procedure` / `function` (with parameters, `var`
-  by-reference params, local declarations, and recursion)
+- `program`, `const`, `var`, and `procedure` / `function` (with by-value
+  parameters, local declarations, and recursion). `var` (by-reference) parameters
+  are parsed but **not** compiled: the code generator rejects them rather than
+  emit code that silently fails to propagate mutations to the caller.
 - statements: assignment (`:=`), `if/then/else`, `while`, `for..to/downto`,
   `repeat..until`, `case..of`, `begin..end`, and procedure calls
 - expressions with full precedence, parentheses, and the operators

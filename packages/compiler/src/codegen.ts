@@ -110,14 +110,14 @@ class CodeGenerator {
                 return [`${pad}const ${declaration.name} = ${value};`];
             }
             case 'ProcedureDeclaration': {
-                const params = (declaration.parameters ?? []).map((p) => p.name).join(', ');
+                const params = this.genParameters(declaration);
                 const lines = [`${pad}function ${declaration.name}(${params}) {`];
                 if (declaration.body) lines.push(...this.genBlock(declaration.body, level + 1));
                 lines.push(`${pad}}`);
                 return lines;
             }
             case 'FunctionDeclaration': {
-                const params = (declaration.parameters ?? []).map((p) => p.name).join(', ');
+                const params = this.genParameters(declaration);
                 const lines = [`${pad}function ${declaration.name}(${params}) {`];
                 // Pascal functions return by assigning to their own name; lower it to `$result`.
                 lines.push(`${this.pad(level + 1)}let $result;`);
@@ -132,6 +132,23 @@ class CodeGenerator {
             default:
                 throw new Error(`Unsupported declaration: ${(declaration as Declaration).type}`);
         }
+    }
+
+    /**
+     * Renders a subprogram's parameter list. `var` (by-reference) parameters are
+     * NOT supported: JS passes scalars by value, so mutating a `var` parameter
+     * would silently fail to propagate to the caller. Reject them loudly instead
+     * of emitting code that quietly computes the wrong result.
+     */
+    private genParameters(declaration: Declaration): string {
+        const parameters = declaration.parameters ?? [];
+        const byRef = parameters.find((p) => p.isVar);
+        if (byRef) {
+            throw new Error(
+                `'var' (by-reference) parameter '${byRef.name}' in '${declaration.name}' is not supported.`,
+            );
+        }
+        return parameters.map((p) => p.name).join(', ');
     }
 
     private genBlock(block: Block, level: number): string[] {
