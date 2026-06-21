@@ -27,8 +27,19 @@ console.log(js);
 // // Generated from Pascal program: Hello
 // console.log("Hello, world!");
 
-eval(js); // => Hello, world!
+// To run the generated code, write it to a file and execute it in a separate
+// Node process. Avoid eval(js): the output is derived from Pascal source, so it
+// should only be executed when that source is trusted.
+import { writeFileSync } from 'fs';
+import { execFileSync } from 'child_process';
+
+writeFileSync('out.js', js);
+execFileSync('node', ['out.js'], { stdio: 'inherit' }); // => Hello, world!
 ```
+
+> Security: the compiler escapes string literals and identifiers, but generated
+> code still reflects the input program. Only execute the output when the Pascal
+> source is trusted; do not pipe untrusted source straight into `eval`/`new Function`.
 
 You can also generate from an AST you already have:
 
