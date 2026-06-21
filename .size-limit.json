@@ -1,0 +1,22 @@
+[
+  {
+    "name": "pascal-tokenizer",
+    "path": "packages/tokenizer/dist/index.js",
+    "limit": "3 kB"
+  },
+  {
+    "name": "pascal-parser",
+    "path": "packages/parser/dist/index.js",
+    "limit": "6 kB"
+  },
+  {
+    "name": "pascal-js-compiler",
+    "path": "packages/compiler/dist/index.js",
+    "limit": "9 kB"
+  },
+  {
+    "name": "pascal-code-formatter",
+    "path": "packages/code-formatter/dist/index.js",
+    "limit": "6 kB"
+  }
+]

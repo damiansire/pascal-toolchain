@@ -18,7 +18,11 @@
     "build": "tsc",
     "test": "jest --coverage",
     "test:watch": "jest --watch --coverage",
+    "test:types": "tsd",
     "prepublishOnly": "npm run build"
+  },
+  "tsd": {
+    "directory": "test-d"
   },
   "repository": {
     "type": "git",

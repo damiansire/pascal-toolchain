@@ -60,6 +60,39 @@ npm run changeset    # describe a user-facing change + version bump
 Focus a single package with `-w <npm-name>`, e.g.
 `npm run build -w pascal-parser` or `npm test -w pascal-tokenizer`.
 
+## Dependency-pinning policy
+
+Two kinds of coupling exist; they are versioned differently on purpose.
+
+- **Intra-monorepo deps** (`pascal-tokenizer`, `pascal-parser`, `pascal-js-compiler`)
+  use a caret range (`^x.y.z`). They are released together through Changesets,
+  so the workspace always resolves to a compatible sibling and the caret is
+  safe and intended.
+- **Cross-repo deps** (libraries published from *other* repos — currently
+  `counterweight-stack` and `objects-deep-compare`, consumed by
+  `pascal-code-formatter`) are **pinned to an exact version** (no caret, no
+  tilde). These come from a separate release train we do not control in this
+  repo, so a `^`/`~` range would let an upstream patch/minor change behavior
+  silently. Bumping one of these is a deliberate, reviewed change: update the
+  exact version, run `npm run build && npm test`, and ship a changeset.
+
+When you add a new dependency, classify it first: same-repo sibling → caret;
+anything published from another repo → exact pin.
+
+## CI gates
+
+`.github/workflows/ci.yml` runs on every PR:
+
+- `build-test` across a Node matrix (18, 20, 22): build in dependency order,
+  full test suite, and **type-tests** of the public API (`npm run test:types`,
+  tsd against each package's built `.d.ts`).
+- `bundle-size`: `npm run size` enforces the per-package budget in
+  `.size-limit.json` (minified + brotli). A package that grows past its budget
+  fails the check.
+
+Type-tests live in each package's `test-d/*.test-d.ts` and are excluded from the
+published tarball by the `files` allowlist.
+
 ## Releasing
 
 Versioning/publishing is handled with Changesets; each package keeps its own

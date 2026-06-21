@@ -30,11 +30,15 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:types": "tsd",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "prepublishOnly": "npm test && npm run lint",
     "docs": "typedoc --out docs src"
+  },
+  "tsd": {
+    "directory": "test-d"
   },
   "keywords": [
     "pascal",

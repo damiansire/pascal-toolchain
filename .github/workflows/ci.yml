@@ -4,10 +4,35 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build (ordered across packages)
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Type-tests (public API)
+        run: npm run test:types
+
+  bundle-size:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,5 +48,5 @@ jobs:
       - name: Build (ordered across packages)
         run: npm run build
 
-      - name: Test
-        run: npm test
+      - name: Bundle-size budget
+        run: npm run size

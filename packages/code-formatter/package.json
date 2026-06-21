@@ -21,7 +21,11 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:types": "tsd",
     "prepublishOnly": "npm run build"
+  },
+  "tsd": {
+    "directory": "test-d"
   },
   "keywords": [
     "pascal",
@@ -41,8 +45,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "counterweight-stack": "^0.0.1",
-    "objects-deep-compare": "^0.0.1",
+    "counterweight-stack": "0.0.1",
+    "objects-deep-compare": "0.0.1",
     "pascal-tokenizer": "^0.0.3"
   },
   "directories": {
