@@ -48,6 +48,15 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
   const tokens: Array<PascalToken> = [];
   let currentIndex = 0;
 
+  // Reports a fatal lexing error with a 1-based line:column derived from `index`,
+  // instead of writing to console and continuing with a corrupt token stream.
+  const fail = (message: string, index: number): never => {
+    const upTo = code.slice(0, index);
+    const line = upTo.split("\n").length;
+    const column = index - upTo.lastIndexOf("\n");
+    throw new Error(`${message} at line ${line}, column ${column}`);
+  };
+
   // Common Pascal keywords (case-insensitive)
   const keywords = new Set([
     "program",
@@ -128,8 +137,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       currentIndex++;
       let commentEnd = code.indexOf("}", currentIndex);
       if (commentEnd === -1) {
-        console.error("Error: Unclosed '{' comment.");
-        currentIndex = code.length;
+        fail("Unclosed '{' comment", currentIndex - 1);
       } else {
         if (!skipComments) {
           const comment = code.substring(currentIndex - 1, commentEnd + 1);
@@ -147,8 +155,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       currentIndex += 2;
       let commentEnd = code.indexOf("*)", currentIndex);
       if (commentEnd === -1) {
-        console.error("Error: Unclosed '(*' comment.");
-        currentIndex = code.length;
+        fail("Unclosed '(*' comment", currentIndex - 2);
       } else {
         if (!skipComments) {
           const comment = code.substring(currentIndex - 2, commentEnd + 2);
@@ -210,6 +217,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     if (char === "'") {
       let stringValue = "";
       let lookaheadIndex = currentIndex + 1; // Skip initial quote
+      let closed = false;
       while (lookaheadIndex < code.length) {
         let strChar = code[lookaheadIndex];
         if (strChar === "'") {
@@ -220,6 +228,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
           } else {
             // End of string
             lookaheadIndex++; // Skip final quote
+            closed = true;
             break;
           }
         } else {
@@ -227,9 +236,8 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
           lookaheadIndex++;
         }
       }
-      if (lookaheadIndex > code.length && code[lookaheadIndex - 1] !== "'") {
-        // Basic check
-        console.error("Error: Unclosed string literal.");
+      if (!closed) {
+        fail("Unclosed string literal", currentIndex);
       }
       tokens.push({ type: "STRING_LITERAL", value: stringValue });
       currentIndex = lookaheadIndex;
@@ -325,8 +333,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     }
 
     // 8. Unknown Character
-    console.error(`Error: Unknown character '${char}' at position ${currentIndex}`);
-    currentIndex++; // Skip to avoid infinite loops
+    fail(`Unknown character '${char}'`, currentIndex);
   }
 
   tokens.push({ type: "EOF", value: "" });
