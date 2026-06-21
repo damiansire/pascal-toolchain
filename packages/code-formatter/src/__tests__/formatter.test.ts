@@ -1,6 +1,6 @@
 import { formatPascalCode } from "../formatter";
-import { FormattedPascalLine, LineType, StructuralType } from "../shared/types";
-import { WhiteSpace, EmptyLine, VAR, PROGRAM, DELIMITER_SEMICOLON, DELIMITER_COLON, KEYWORD_INTEGER, KEYWORD_BEGIN } from "../shared/elements";
+import { FormattedPascalLine } from "../shared/types";
+import { WhiteSpace, EmptyLine, DELIMITER_SEMICOLON } from "../shared/elements";
 import { createProgramLine, createVarDeclarationLine, createVarDefinitionLine, createBeginLine, createEndLine, createWritelnLine, createIfStatementLine, createElseStatementLine, createFormattedLine } from "./test-helpers";
 
 
@@ -99,6 +99,16 @@ describe("formatPascalCode", () => {
       createEndLine({ indent: 0, withDot: true })
     ];
     expect(formatPascalCode(input)).toEqual(expected);
+  });
+
+  test("indentation is case-insensitive: UPPERCASE keywords indent like lowercase ones", () => {
+    // Pascal is case-insensitive; VAR/BEGIN/END must drive indentation exactly
+    // like var/begin/end. Compare the indentation sequence (the IdentationManager's
+    // job), ignoring the preserved token casing in the output.
+    const lower = "program Test; var x: integer; y: integer; begin end.";
+    const upper = "PROGRAM Test; VAR x: INTEGER; y: INTEGER; BEGIN END.";
+    const indents = (code: string) => formatPascalCode(code).map((line) => line.indentation);
+    expect(indents(upper)).toEqual(indents(lower));
   });
 
   test("should format a simple Hello World program with comments", () => {

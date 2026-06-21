@@ -17,14 +17,23 @@ const rules: CounterweightRule<PascalToken>[] = [
   },
 ];
 
+/**
+ * Pascal is case-insensitive, but the tokenizer preserves the source casing, so a
+ * `VAR`/`Begin`/`END` token would never deep-equal the lower-case rule constants.
+ * Canonicalize keyword values to lower-case before any comparison or stack op.
+ */
+const canonicalize = (token: PascalToken): PascalToken =>
+  token.type === "KEYWORD" ? { ...token, value: token.value.toLowerCase() } : token;
+
 class IdentationManager {
   private indentationStack: CounterweightStack<PascalToken>;
   constructor() {
     this.indentationStack = new CounterweightStack<PascalToken>(rules);
   }
   evaluateLineIndentation(tokens: PascalToken[]) {
+    const canonical = tokens.map(canonicalize);
     let currentIndent = this.indentationStack.size();
-    for (const token of tokens) {
+    for (const token of canonical) {
       const result = this.indentationStack.pop(token);
       if (result?.type === "KEYWORD") {
         if (result?.value === "var") {
@@ -32,12 +41,12 @@ class IdentationManager {
         }
       }
     }
-    for (const token of tokens) {
+    for (const token of canonical) {
       if (deepEqual(token, varToken) || deepEqual(token, beginToken)) {
         this.indentationStack.push(token);
       }
     }
-    if (tokens.some((token) => deepEqual(token, endToken))) {
+    if (canonical.some((token) => deepEqual(token, endToken))) {
       currentIndent = this.indentationStack.size();
     }
     return currentIndent;
