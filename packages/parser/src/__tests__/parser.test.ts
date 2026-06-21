@@ -1,5 +1,13 @@
 import { parse, isValid } from '../parser';
-import { ParseError } from '../types';
+import {
+  ParseError,
+  IfStatement,
+  Declaration,
+  Block,
+  RepeatStatement,
+  CaseStatement,
+  CompoundStatement,
+} from '../types';
 
 describe('Pascal Parser', () => {
   describe('Hello World Program', () => {
@@ -235,10 +243,10 @@ end.`);
       const ast = parse(
         `program P; var x: integer; begin if (x mod 2 = 0) and (x div 2 > 0) then begin writeln('even'); writeln('positive'); end; end.`,
       );
-      const ifStmt: any = ast.statements[0];
+      const ifStmt = ast.statements[0] as IfStatement;
       expect(ifStmt.type).toBe('IfStatement');
       expect(ifStmt.thenBranch).toMatchObject({ type: 'CompoundStatement' });
-      expect(ifStmt.thenBranch.statements).toHaveLength(2);
+      expect((ifStmt.thenBranch as CompoundStatement).statements).toHaveLength(2);
     });
 
     it('parses a function declaration with parameters and return type', () => {
@@ -294,10 +302,11 @@ end;
 begin
   writeln(sumTo(5));
 end.`);
-      const fn: any = ast.declarations[0];
+      const fn = ast.declarations[0] as Declaration;
       expect(fn.type).toBe('FunctionDeclaration');
-      expect(fn.body.declarations).toHaveLength(2);
-      expect(fn.body.declarations[0]).toMatchObject({
+      const body = fn.body as Block;
+      expect(body.declarations).toHaveLength(2);
+      expect(body.declarations?.[0]).toMatchObject({
         type: 'VariableDeclaration',
         name: 'i',
         varType: 'integer',
@@ -343,7 +352,7 @@ end.`);
         type: 'RepeatStatement',
         condition: { type: 'BinaryExpression', operator: '>=' },
       });
-      expect((ast.statements[1] as any).body).toHaveLength(1);
+      expect((ast.statements[1] as RepeatStatement).body).toHaveLength(1);
     });
 
     it('parses case..of with multiple labels and an else branch', () => {
@@ -358,11 +367,24 @@ begin
         writeln('other');
     end;
 end.`);
-      const caseStmt: any = ast.statements[0];
+      const caseStmt = ast.statements[0] as CaseStatement;
       expect(caseStmt.type).toBe('CaseStatement');
       expect(caseStmt.clauses).toHaveLength(2);
       expect(caseStmt.clauses[1].labels).toHaveLength(2);
       expect(caseStmt.elseBranch).toMatchObject({ type: 'CallStatement', name: 'writeln' });
+    });
+
+    it('accepts empty statements (stray semicolons)', () => {
+      const ast = parse(`program P; begin writeln('a');; writeln('b'); end.`);
+      expect(ast.statements).toHaveLength(2);
+      expect(ast.statements[0]).toMatchObject({ type: 'CallStatement', name: 'writeln' });
+      expect(ast.statements[1]).toMatchObject({ type: 'CallStatement', name: 'writeln' });
+    });
+
+    it('throws a catchable ParseError (not a RangeError) on pathologically deep nesting', () => {
+      const deep = `program P; begin x := ${'('.repeat(5000)}1${')'.repeat(5000)}; end.`;
+      expect(() => parse(deep)).toThrow(ParseError);
+      expect(isValid(deep)).toBe(false);
     });
   });
 });

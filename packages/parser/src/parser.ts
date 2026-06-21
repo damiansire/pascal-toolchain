@@ -48,12 +48,31 @@ const MULTIPLICATIVE_OPS = new Set(['*', '/', 'div', 'mod', 'and']);
 const WORD_BINARY_OPS = new Set(['div', 'mod', 'and', 'or']);
 const TYPE_KEYWORDS = new Set(['integer', 'real', 'char', 'string', 'boolean']);
 
+/**
+ * Maximum nesting depth for expressions and statements. Untrusted input (e.g. a
+ * long run of '(') could otherwise drive unbounded recursion and crash the host
+ * with a native RangeError instead of a catchable ParseError.
+ */
+const MAX_NESTING_DEPTH = 500;
+
 class Parser {
   private tokens: PascalToken[] = [];
   private current: number = 0;
+  private depth = 0;
 
   constructor(source: string) {
     this.tokens = tokenizePascal(source);
+  }
+
+  /** Guards recursive descent against unbounded nesting (DoS). Throws ParseError. */
+  private enter(): void {
+    if (++this.depth > MAX_NESTING_DEPTH) {
+      throw new ParseError('Expression or statement nesting too deep');
+    }
+  }
+
+  private leave(): void {
+    this.depth--;
   }
 
   // ---- token helpers -----------------------------------------------------
@@ -284,6 +303,10 @@ class Parser {
   private parseStatementList(): Statement[] {
     const statements: Statement[] = [];
     while (!this.isAtEnd() && !this.checkKeyword('end')) {
+      // The empty statement is legal Pascal: a stray ';' (as in `a;; b` or a ';'
+      // right before the closer) is an empty statement, not a syntax error.
+      // Skip it instead of trying to parse a statement out of the ';'.
+      if (this.match('DELIMITER_SEMICOLON')) continue;
       statements.push(this.parseStatement());
       // In Pascal ';' is a statement separator, not a terminator: it is
       // optional before the block closer ('end'/'until'). Consume it when
@@ -295,6 +318,15 @@ class Parser {
   }
 
   private parseStatement(): Statement {
+    this.enter();
+    try {
+      return this.parseStatementInner();
+    } finally {
+      this.leave();
+    }
+  }
+
+  private parseStatementInner(): Statement {
     if (this.checkKeyword('begin')) return this.parseCompound();
     if (this.checkKeyword('if')) return this.parseIf();
     if (this.checkKeyword('while')) return this.parseWhile();
@@ -475,7 +507,12 @@ class Parser {
   // ---- expressions (precedence climbing) --------------------------------
 
   private parseExpression(): Expression {
-    return this.parseRelational();
+    this.enter();
+    try {
+      return this.parseRelational();
+    } finally {
+      this.leave();
+    }
   }
 
   private currentOperator(): string | null {
@@ -638,7 +675,10 @@ export function isValid(source: string): boolean {
   try {
     parse(source);
     return true;
-  } catch {
-    return false;
+  } catch (e) {
+    // Only a genuine parse failure means "not valid Pascal". Any other error
+    // (a bug, an unexpected RangeError, etc.) must surface, not be masked.
+    if (e instanceof ParseError) return false;
+    throw e;
   }
 }
