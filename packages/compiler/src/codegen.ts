@@ -94,35 +94,36 @@ class CodeGenerator {
         const pad = this.pad(level);
         switch (declaration.type) {
             case 'VariableDeclaration': {
+                const name = this.mapIdentifier(declaration.name);
                 if (declaration.arrayBounds) {
                     const { low, high } = declaration.arrayBounds;
-                    this.arrayLowBounds.set(declaration.name, low);
+                    this.arrayLowBounds.set(name, low);
                     const size = high - low + 1;
                     return [
-                        `${pad}let ${declaration.name} = new Array(${size}).fill(0); // array[${low}..${high}] of ${declaration.varType}`,
+                        `${pad}let ${name} = new Array(${size}).fill(0); // array[${low}..${high}] of ${declaration.varType}`,
                     ];
                 }
                 const typeComment = declaration.varType ? ` // ${declaration.varType}` : '';
-                return [`${pad}let ${declaration.name};${typeComment}`];
+                return [`${pad}let ${name};${typeComment}`];
             }
             case 'ConstantDeclaration': {
                 const value = declaration.value ? this.genExpression(declaration.value) : 'undefined';
-                return [`${pad}const ${declaration.name} = ${value};`];
+                return [`${pad}const ${this.mapIdentifier(declaration.name)} = ${value};`];
             }
             case 'ProcedureDeclaration': {
                 const params = this.genParameters(declaration);
-                const lines = [`${pad}function ${declaration.name}(${params}) {`];
+                const lines = [`${pad}function ${this.mapIdentifier(declaration.name)}(${params}) {`];
                 if (declaration.body) lines.push(...this.genBlock(declaration.body, level + 1));
                 lines.push(`${pad}}`);
                 return lines;
             }
             case 'FunctionDeclaration': {
                 const params = this.genParameters(declaration);
-                const lines = [`${pad}function ${declaration.name}(${params}) {`];
+                const lines = [`${pad}function ${this.mapIdentifier(declaration.name)}(${params}) {`];
                 // Pascal functions return by assigning to their own name; lower it to `$result`.
                 lines.push(`${this.pad(level + 1)}let $result;`);
                 const previous = this.currentFunction;
-                this.currentFunction = declaration.name;
+                this.currentFunction = declaration.name.toLowerCase();
                 if (declaration.body) lines.push(...this.genBlock(declaration.body, level + 1));
                 this.currentFunction = previous;
                 lines.push(`${this.pad(level + 1)}return $result;`);
@@ -148,7 +149,7 @@ class CodeGenerator {
                 `'var' (by-reference) parameter '${byRef.name}' in '${declaration.name}' is not supported.`,
             );
         }
-        return parameters.map((p) => p.name).join(', ');
+        return parameters.map((p) => this.mapIdentifier(p.name)).join(', ');
     }
 
     private genBlock(block: Block, level: number): string[] {
@@ -180,7 +181,7 @@ class CodeGenerator {
             case 'AssignmentStatement': {
                 const s = statement as AssignmentStatement;
                 // Assignment to the enclosing function's name is a return value.
-                if (this.currentFunction && s.left.type === 'Identifier' && s.left.name === this.currentFunction) {
+                if (this.currentFunction && s.left.type === 'Identifier' && s.left.name.toLowerCase() === this.currentFunction) {
                     return [`${pad}$result = ${this.genExpression(s.right)};`];
                 }
                 return [`${pad}${this.genExpression(s.left)} = ${this.genExpression(s.right)};`];
@@ -275,7 +276,7 @@ class CodeGenerator {
             return `${pad}${args[0]} ${op} ${amount};`;
         }
 
-        return `${pad}${statement.name}(${args.join(', ')});`;
+        return `${pad}${this.mapIdentifier(statement.name)}(${args.join(', ')});`;
     }
 
     /** Maps Pascal builtin functions used in expressions to JavaScript. */
@@ -329,7 +330,7 @@ class CodeGenerator {
                 return `(${this.mapUnary(e.operator)}${this.genExpression(e.argument)})`;
             }
             case 'Identifier':
-                return (expression as Identifier).name;
+                return this.mapIdentifier((expression as Identifier).name);
             case 'NumericLiteral':
                 return String((expression as NumericLiteral).value);
             case 'StringLiteral':
@@ -341,7 +342,7 @@ class CodeGenerator {
                 const e = expression as CallExpression;
                 const args = e.arguments.map((a) => this.genExpression(a));
                 const builtin = this.genBuiltinCall(e.callee, args);
-                return builtin ?? `${e.callee}(${args.join(', ')})`;
+                return builtin ?? `${this.mapIdentifier(e.callee)}(${args.join(', ')})`;
             }
             case 'IndexExpression': {
                 const e = expression as IndexExpression;
@@ -350,7 +351,7 @@ class CodeGenerator {
                 // Offset Pascal's (possibly non-zero) low bound to 0-based JS indexing.
                 const low =
                     e.array.type === 'Identifier'
-                        ? this.arrayLowBounds.get((e.array as Identifier).name)
+                        ? this.arrayLowBounds.get(this.mapIdentifier((e.array as Identifier).name))
                         : undefined;
                 if (low !== undefined && low !== 0) return `${arr}[${idx} - ${low}]`;
                 return `${arr}[${idx}]`;
@@ -385,6 +386,29 @@ class CodeGenerator {
             return false;
         }
         return false;
+    }
+
+    /** JS reserved words / globals a canonicalized Pascal name must not shadow. */
+    private static readonly JS_RESERVED = new Set([
+        'break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default',
+        'delete', 'do', 'else', 'enum', 'export', 'extends', 'false', 'finally', 'for',
+        'function', 'if', 'import', 'in', 'instanceof', 'new', 'null', 'return', 'super',
+        'switch', 'this', 'throw', 'true', 'try', 'typeof', 'var', 'void', 'while',
+        'with', 'yield', 'let', 'static', 'await', 'async', 'arguments', 'eval',
+        'undefined', 'nan', 'infinity',
+    ]);
+
+    /**
+     * Maps a Pascal identifier to its JavaScript form. Pascal is case-insensitive
+     * for identifiers (ISO 7185 / FPC), so every spelling is canonicalized to
+     * lower-case: 'Count' and 'count' therefore resolve to the same JS variable
+     * instead of two distinct ones. Names that would collide with a JS reserved
+     * word are prefixed with '$' — a character Pascal identifiers cannot contain,
+     * so no user name can ever clash with the escaped form.
+     */
+    private mapIdentifier(name: string): string {
+        const canonical = name.toLowerCase();
+        return CodeGenerator.JS_RESERVED.has(canonical) ? `$${canonical}` : canonical;
     }
 
     private mapBinary(operator: string): string {
