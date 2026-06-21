@@ -245,7 +245,9 @@ class CodeGenerator {
             const sink = name === 'writeln' ? 'console.log' : 'process.stdout.write';
             if (args.length === 0) return `${pad}${sink}('');`;
             // Pascal concatenates arguments with no separator.
-            const payload = args.length === 1 ? args[0] : `[${args.join(', ')}].join('')`;
+            const joined = args.length === 1 ? args[0] : `[${args.join(', ')}].join('')`;
+            // process.stdout.write only accepts strings/Buffers, so coerce; console.log tolerates anything.
+            const payload = name === 'write' ? `String(${joined})` : joined;
             return `${pad}${sink}(${payload});`;
         }
 
