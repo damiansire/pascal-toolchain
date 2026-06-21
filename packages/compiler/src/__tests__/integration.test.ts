@@ -2,22 +2,22 @@ import { compile } from '../codegen';
 
 /** Compiles Pascal, runs the generated JS, and returns everything logged. */
 function run(source: string): unknown[] {
-    const js = compile(source);
-    const logged: unknown[] = [];
-    const spy = jest.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
-        logged.push(args.length === 1 ? args[0] : args);
-    });
-    try {
-        new Function(js)();
-    } finally {
-        spy.mockRestore();
-    }
-    return logged;
+  const js = compile(source);
+  const logged: unknown[] = [];
+  const spy = jest.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+    logged.push(args.length === 1 ? args[0] : args);
+  });
+  try {
+    new Function(js)();
+  } finally {
+    spy.mockRestore();
+  }
+  return logged;
 }
 
 describe('pascal-toolchain — full pipeline (Pascal source → running JS)', () => {
-    it('runs a program with variables and a for..to loop', () => {
-        const output = run(`
+  it('runs a program with variables and a for..to loop', () => {
+    const output = run(`
 program Sum;
 var
     i, total: integer;
@@ -27,11 +27,11 @@ begin
         total := total + i;
     writeln(total);
 end.`);
-        expect(output).toEqual([15]);
-    });
+    expect(output).toEqual([15]);
+  });
 
-    it('runs if/else with the mod operator', () => {
-        const output = run(`
+  it('runs if/else with the mod operator', () => {
+    const output = run(`
 program Parity;
 var
     n: integer;
@@ -42,11 +42,11 @@ begin
     else
         writeln('odd');
 end.`);
-        expect(output).toEqual(['odd']);
-    });
+    expect(output).toEqual(['odd']);
+  });
 
-    it('runs a while loop with integer division (div)', () => {
-        const output = run(`
+  it('runs a while loop with integer division (div)', () => {
+    const output = run(`
 program Halving;
 var
     x: integer;
@@ -56,11 +56,11 @@ begin
         x := x div 2;
     writeln(x);
 end.`);
-        expect(output).toEqual([1]);
-    });
+    expect(output).toEqual([1]);
+  });
 
-    it('respects operator precedence in arithmetic', () => {
-        const output = run(`
+  it('respects operator precedence in arithmetic', () => {
+    const output = run(`
 program Math;
 var
     r: integer;
@@ -68,11 +68,11 @@ begin
     r := 2 + 3 * 4;
     writeln(r);
 end.`);
-        expect(output).toEqual([14]);
-    });
+    expect(output).toEqual([14]);
+  });
 
-    it('runs a function (return-by-name lowered to return)', () => {
-        const output = run(`
+  it('runs a function (return-by-name lowered to return)', () => {
+    const output = run(`
 program Doubler;
 function double(n: integer): integer;
 begin
@@ -81,11 +81,11 @@ end;
 begin
     writeln(double(21));
 end.`);
-        expect(output).toEqual([42]);
-    });
+    expect(output).toEqual([42]);
+  });
 
-    it('runs a procedure call', () => {
-        const output = run(`
+  it('runs a procedure call', () => {
+    const output = run(`
 program Greeter;
 procedure greet(name: string);
 begin
@@ -94,11 +94,11 @@ end;
 begin
     greet('hola');
 end.`);
-        expect(output).toEqual(['hola']);
-    });
+    expect(output).toEqual(['hola']);
+  });
 
-    it('runs a recursive function (factorial)', () => {
-        const output = run(`
+  it('runs a recursive function (factorial)', () => {
+    const output = run(`
 program Fact;
 function fact(n: integer): integer;
 begin
@@ -110,11 +110,11 @@ end;
 begin
     writeln(fact(5));
 end.`);
-        expect(output).toEqual([120]);
-    });
+    expect(output).toEqual([120]);
+  });
 
-    it('runs a program using arrays with 1-based indexing', () => {
-        const output = run(`
+  it('runs a program using arrays with 1-based indexing', () => {
+    const output = run(`
 program Squares;
 var
     a: array[1..5] of integer;
@@ -127,11 +127,11 @@ begin
         total := total + a[i];
     writeln(total);
 end.`);
-        expect(output).toEqual([55]);
-    });
+    expect(output).toEqual([55]);
+  });
 
-    it('supports builtins: inc/dec (statements) and abs/sqr (expressions)', () => {
-        const output = run(`
+  it('supports builtins: inc/dec (statements) and abs/sqr (expressions)', () => {
+    const output = run(`
 program Builtins;
 var
     x: integer;
@@ -144,11 +144,11 @@ begin
     writeln(abs(0 - 3));
     writeln(sqr(4));
 end.`);
-        expect(output).toEqual([7, 3, 16]);
-    });
+    expect(output).toEqual([7, 3, 16]);
+  });
 
-    it('runs a function with local variables', () => {
-        const output = run(`
+  it('runs a function with local variables', () => {
+    const output = run(`
 program LocalVars;
 function sumTo(n: integer): integer;
 var
@@ -162,11 +162,11 @@ end;
 begin
     writeln(sumTo(5));
 end.`);
-        expect(output).toEqual([15]);
-    });
+    expect(output).toEqual([15]);
+  });
 
-    it('runs a repeat..until loop', () => {
-        const output = run(`
+  it('runs a repeat..until loop', () => {
+    const output = run(`
 program Countup;
 var
     x: integer;
@@ -177,11 +177,11 @@ begin
     until x >= 3;
     writeln(x);
 end.`);
-        expect(output).toEqual([3]);
-    });
+    expect(output).toEqual([3]);
+  });
 
-    it('uses const declarations', () => {
-        const output = run(`
+  it('uses const declarations', () => {
+    const output = run(`
 program Area;
 const
     PI = 3;
@@ -192,11 +192,11 @@ begin
     area := PI * r * r;
     writeln(area);
 end.`);
-        expect(output).toEqual([12]);
-    });
+    expect(output).toEqual([12]);
+  });
 
-    it('runs a case..of statement (with else)', () => {
-        const output = run(`
+  it('runs a case..of statement (with else)', () => {
+    const output = run(`
 program Classify;
 var
     n: integer;
@@ -209,6 +209,6 @@ begin
         writeln('other');
     end;
 end.`);
-        expect(output).toEqual(['two or three']);
-    });
+    expect(output).toEqual(['two or three']);
+  });
 });

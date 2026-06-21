@@ -97,12 +97,14 @@ The parser supports the following Pascal language constructs:
 ### Setup
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/pascal-parser.git
 cd pascal-parser
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -158,4 +160,4 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

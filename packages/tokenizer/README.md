@@ -19,7 +19,7 @@ You can import the tokenizePascal function and optionally the PascalToken and To
 _Input example:_
 
 ```typescript
-import { tokenizePascal, PascalToken, TokenType } from "pascal-tokenizer";
+import { tokenizePascal, PascalToken, TokenType } from 'pascal-tokenizer';
 
 const pascalCode = `
 program HelloWorld;
@@ -33,7 +33,7 @@ const tokens: PascalToken[] = tokenizePascal(pascalCode);
 console.log(tokens);
 
 // Example: Find the first keyword token
-const firstKeyword = tokens.find((token) => token.type === "KEYWORD"); // You can use the imported TokenType for type checking
+const firstKeyword = tokens.find((token) => token.type === 'KEYWORD'); // You can use the imported TokenType for type checking
 
 // Tokenize including comments
 const tokensWithComments = tokenizePascal(pascalCode, false);
@@ -44,18 +44,18 @@ _Default output:_
 
 ```typescript
 [
-  { type: "KEYWORD", value: "program" },
-  { type: "IDENTIFIER", value: "HelloWorld" },
-  { type: "DELIMITER_SEMICOLON", value: ";" },
-  { type: "KEYWORD", value: "begin" },
-  { type: "IDENTIFIER", value: "writeln" },
-  { type: "DELIMITER_LPAREN", value: "(" },
-  { type: "STRING_LITERAL", value: "Hello, World!" },
-  { type: "DELIMITER_RPAREN", value: ")" },
-  { type: "DELIMITER_SEMICOLON", value: ";" },
-  { type: "KEYWORD", value: "end" },
-  { type: "DELIMITER_DOT", value: "." },
-  { type: "EOF", value: "" },
+  { type: 'KEYWORD', value: 'program' },
+  { type: 'IDENTIFIER', value: 'HelloWorld' },
+  { type: 'DELIMITER_SEMICOLON', value: ';' },
+  { type: 'KEYWORD', value: 'begin' },
+  { type: 'IDENTIFIER', value: 'writeln' },
+  { type: 'DELIMITER_LPAREN', value: '(' },
+  { type: 'STRING_LITERAL', value: 'Hello, World!' },
+  { type: 'DELIMITER_RPAREN', value: ')' },
+  { type: 'DELIMITER_SEMICOLON', value: ';' },
+  { type: 'KEYWORD', value: 'end' },
+  { type: 'DELIMITER_DOT', value: '.' },
+  { type: 'EOF', value: '' },
 ];
 ```
 
@@ -63,19 +63,19 @@ _Output with comments:_
 
 ```typescript
 [
-  { type: "KEYWORD", value: "program" },
-  { type: "IDENTIFIER", value: "HelloWorld" },
-  { type: "DELIMITER_SEMICOLON", value: ";" },
-  { type: "KEYWORD", value: "begin" },
-  { type: "IDENTIFIER", value: "writeln" },
-  { type: "DELIMITER_LPAREN", value: "(" },
-  { type: "STRING_LITERAL", value: "Hello, World!" },
-  { type: "DELIMITER_RPAREN", value: ")" },
-  { type: "DELIMITER_SEMICOLON", value: ";" },
-  { type: "COMMENT_LINE", value: "// Example comment" },
-  { type: "KEYWORD", value: "end" },
-  { type: "DELIMITER_DOT", value: "." },
-  { type: "EOF", value: "" },
+  { type: 'KEYWORD', value: 'program' },
+  { type: 'IDENTIFIER', value: 'HelloWorld' },
+  { type: 'DELIMITER_SEMICOLON', value: ';' },
+  { type: 'KEYWORD', value: 'begin' },
+  { type: 'IDENTIFIER', value: 'writeln' },
+  { type: 'DELIMITER_LPAREN', value: '(' },
+  { type: 'STRING_LITERAL', value: 'Hello, World!' },
+  { type: 'DELIMITER_RPAREN', value: ')' },
+  { type: 'DELIMITER_SEMICOLON', value: ';' },
+  { type: 'COMMENT_LINE', value: '// Example comment' },
+  { type: 'KEYWORD', value: 'end' },
+  { type: 'DELIMITER_DOT', value: '.' },
+  { type: 'EOF', value: '' },
 ];
 ```
 

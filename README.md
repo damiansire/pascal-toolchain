@@ -23,12 +23,12 @@ source.pas
 
 ## Packages
 
-| Package | npm | Description |
-|---------|-----|-------------|
-| [`pascal-tokenizer`](./packages/tokenizer) | [![npm](https://img.shields.io/npm/v/pascal-tokenizer)](https://www.npmjs.com/package/pascal-tokenizer) | Lexer: turns Pascal source into a token stream. |
-| [`pascal-parser`](./packages/parser) | [![npm](https://img.shields.io/npm/v/pascal-parser)](https://www.npmjs.com/package/pascal-parser) | Builds an AST from the token stream. |
-| [`pascal-js-compiler`](./packages/compiler) | [![npm](https://img.shields.io/npm/v/pascal-js-compiler)](https://www.npmjs.com/package/pascal-js-compiler) | Code generation: emits JavaScript from the AST. |
-| [`pascal-code-formatter`](./packages/code-formatter) | [![npm](https://img.shields.io/npm/v/pascal-code-formatter)](https://www.npmjs.com/package/pascal-code-formatter) | Pretty-prints / formats Pascal source. |
+| Package                                              | npm                                                                                                               | Description                                     |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| [`pascal-tokenizer`](./packages/tokenizer)           | [![npm](https://img.shields.io/npm/v/pascal-tokenizer)](https://www.npmjs.com/package/pascal-tokenizer)           | Lexer: turns Pascal source into a token stream. |
+| [`pascal-parser`](./packages/parser)                 | [![npm](https://img.shields.io/npm/v/pascal-parser)](https://www.npmjs.com/package/pascal-parser)                 | Builds an AST from the token stream.            |
+| [`pascal-js-compiler`](./packages/compiler)          | [![npm](https://img.shields.io/npm/v/pascal-js-compiler)](https://www.npmjs.com/package/pascal-js-compiler)       | Code generation: emits JavaScript from the AST. |
+| [`pascal-code-formatter`](./packages/code-formatter) | [![npm](https://img.shields.io/npm/v/pascal-code-formatter)](https://www.npmjs.com/package/pascal-code-formatter) | Pretty-prints / formats Pascal source.          |
 
 The pipeline is now complete end to end: `pascal-js-compiler` closes it by turning
 the parser's AST into runnable JavaScript.

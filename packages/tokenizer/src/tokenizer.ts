@@ -1,43 +1,43 @@
 // Define all possible token types
 export type TokenType =
   // Comments
-  | "COMMENT_BLOCK_BRACE"
-  | "COMMENT_STAR"
-  | "COMMENT_LINE"
+  | 'COMMENT_BLOCK_BRACE'
+  | 'COMMENT_STAR'
+  | 'COMMENT_LINE'
   // Operators
-  | "OPERATOR_ASSIGN"
-  | "OPERATOR_LESS_EQUAL"
-  | "OPERATOR_GREATER_EQUAL"
-  | "OPERATOR_NOT_EQUAL"
-  | "OPERATOR_RANGE"
-  | "OPERATOR_PLUS"
-  | "OPERATOR_MINUS"
-  | "OPERATOR_MULTIPLY"
-  | "OPERATOR_DIVIDE"
-  | "OPERATOR_EQUAL"
-  | "OPERATOR_LESS"
-  | "OPERATOR_GREATER"
-  | "OPERATOR_POINTER"
-  | "OPERATOR_ADDRESSOF"
+  | 'OPERATOR_ASSIGN'
+  | 'OPERATOR_LESS_EQUAL'
+  | 'OPERATOR_GREATER_EQUAL'
+  | 'OPERATOR_NOT_EQUAL'
+  | 'OPERATOR_RANGE'
+  | 'OPERATOR_PLUS'
+  | 'OPERATOR_MINUS'
+  | 'OPERATOR_MULTIPLY'
+  | 'OPERATOR_DIVIDE'
+  | 'OPERATOR_EQUAL'
+  | 'OPERATOR_LESS'
+  | 'OPERATOR_GREATER'
+  | 'OPERATOR_POINTER'
+  | 'OPERATOR_ADDRESSOF'
   // Delimiters
-  | "DELIMITER_SEMICOLON"
-  | "DELIMITER_COMMA"
-  | "DELIMITER_DOT"
-  | "DELIMITER_LPAREN"
-  | "DELIMITER_RPAREN"
-  | "DELIMITER_LBRACKET"
-  | "DELIMITER_RBRACKET"
-  | "DELIMITER_COLON"
+  | 'DELIMITER_SEMICOLON'
+  | 'DELIMITER_COMMA'
+  | 'DELIMITER_DOT'
+  | 'DELIMITER_LPAREN'
+  | 'DELIMITER_RPAREN'
+  | 'DELIMITER_LBRACKET'
+  | 'DELIMITER_RBRACKET'
+  | 'DELIMITER_COLON'
   // Literals
-  | "STRING_LITERAL"
-  | "BOOLEAN_LITERAL"
-  | "NUMBER_REAL"
-  | "NUMBER_INTEGER"
+  | 'STRING_LITERAL'
+  | 'BOOLEAN_LITERAL'
+  | 'NUMBER_REAL'
+  | 'NUMBER_INTEGER'
   // Others
-  | "KEYWORD"
-  | "IDENTIFIER"
-  | "EOF"
-  | "WHITESPACE";
+  | 'KEYWORD'
+  | 'IDENTIFIER'
+  | 'EOF'
+  | 'WHITESPACE';
 
 export interface PascalToken {
   type: TokenType;
@@ -52,67 +52,67 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
   // instead of writing to console and continuing with a corrupt token stream.
   const fail = (message: string, index: number): never => {
     const upTo = code.slice(0, index);
-    const line = upTo.split("\n").length;
-    const column = index - upTo.lastIndexOf("\n");
+    const line = upTo.split('\n').length;
+    const column = index - upTo.lastIndexOf('\n');
     throw new Error(`${message} at line ${line}, column ${column}`);
   };
 
   // Common Pascal keywords (case-insensitive)
   const keywords = new Set([
-    "program",
-    "const",
-    "var",
-    "begin",
-    "end",
-    "if",
-    "then",
-    "else",
-    "while",
-    "do",
-    "for",
-    "to",
-    "downto",
-    "repeat",
-    "until",
-    "case",
-    "of",
-    "record",
-    "array",
-    "procedure",
-    "function",
-    "type",
-    "integer",
-    "real",
-    "char",
-    "string",
-    "boolean", // Common types
-    "uses",
-    "label",
-    "goto",
-    "true",
-    "false", // Boolean literals treated as keywords
+    'program',
+    'const',
+    'var',
+    'begin',
+    'end',
+    'if',
+    'then',
+    'else',
+    'while',
+    'do',
+    'for',
+    'to',
+    'downto',
+    'repeat',
+    'until',
+    'case',
+    'of',
+    'record',
+    'array',
+    'procedure',
+    'function',
+    'type',
+    'integer',
+    'real',
+    'char',
+    'string',
+    'boolean', // Common types
+    'uses',
+    'label',
+    'goto',
+    'true',
+    'false', // Boolean literals treated as keywords
   ]);
 
   // Simple map of single-character operators/delimiters
   // Added ^, @, [, ]
   const singleCharTokens: { [key: string]: TokenType } = {
-    ";": "DELIMITER_SEMICOLON",
-    ",": "DELIMITER_COMMA",
-    ".": "DELIMITER_DOT",
-    "(": "DELIMITER_LPAREN",
-    ")": "DELIMITER_RPAREN",
-    "[": "DELIMITER_LBRACKET",
-    "]": "DELIMITER_RBRACKET",
-    "+": "OPERATOR_PLUS",
-    "-": "OPERATOR_MINUS",
-    "*": "OPERATOR_MULTIPLY",
-    "/": "OPERATOR_DIVIDE",
-    "=": "OPERATOR_EQUAL",
-    "<": "OPERATOR_LESS", // Could be part of <= or <>
-    ">": "OPERATOR_GREATER", // Could be part of >=
-    ":": "DELIMITER_COLON", // Could be part of :=
-    "^": "OPERATOR_POINTER",
-    "@": "OPERATOR_ADDRESSOF",
+    ';': 'DELIMITER_SEMICOLON',
+    ',': 'DELIMITER_COMMA',
+    '.': 'DELIMITER_DOT',
+    '(': 'DELIMITER_LPAREN',
+    ')': 'DELIMITER_RPAREN',
+    '[': 'DELIMITER_LBRACKET',
+    ']': 'DELIMITER_RBRACKET',
+    '+': 'OPERATOR_PLUS',
+    '-': 'OPERATOR_MINUS',
+    '*': 'OPERATOR_MULTIPLY',
+    '/': 'OPERATOR_DIVIDE',
+    '=': 'OPERATOR_EQUAL',
+    '<': 'OPERATOR_LESS', // Could be part of <= or <>
+    '>': 'OPERATOR_GREATER', // Could be part of >=
+    ':': 'DELIMITER_COLON', // Could be part of :=
+    '^': 'OPERATOR_POINTER',
+    '@': 'OPERATOR_ADDRESSOF',
   };
 
   // Useful regular expressions
@@ -123,7 +123,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
 
   while (currentIndex < code.length) {
     const char = code[currentIndex];
-    const nextChar = code[currentIndex + 1] || ""; // Simple lookahead
+    const nextChar = code[currentIndex + 1] || ''; // Simple lookahead
 
     // 1. Ignore Whitespace
     if (whitespaceRegex.test(char)) {
@@ -133,16 +133,16 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
 
     // 2. Handle Comments (CHECK BEFORE SIMPLE OPERATORS)
     // Comment type { ... }
-    if (char === "{") {
+    if (char === '{') {
       currentIndex++;
-      const commentEnd = code.indexOf("}", currentIndex);
+      const commentEnd = code.indexOf('}', currentIndex);
       if (commentEnd === -1) {
         fail("Unclosed '{' comment", currentIndex - 1);
       } else {
         if (!skipComments) {
           const comment = code.substring(currentIndex - 1, commentEnd + 1);
           tokens.push({
-            type: "COMMENT_BLOCK_BRACE",
+            type: 'COMMENT_BLOCK_BRACE',
             value: comment,
           });
         }
@@ -151,16 +151,16 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       continue;
     }
     // Comment type (* ... *)
-    if (char === "(" && nextChar === "*") {
+    if (char === '(' && nextChar === '*') {
       currentIndex += 2;
-      const commentEnd = code.indexOf("*)", currentIndex);
+      const commentEnd = code.indexOf('*)', currentIndex);
       if (commentEnd === -1) {
         fail("Unclosed '(*' comment", currentIndex - 2);
       } else {
         if (!skipComments) {
           const comment = code.substring(currentIndex - 2, commentEnd + 2);
           tokens.push({
-            type: "COMMENT_STAR",
+            type: 'COMMENT_STAR',
             value: comment,
           });
         }
@@ -169,17 +169,17 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       continue;
     }
     // Comment type // ... until end of line (Common in Delphi/FPC)
-    if (char === "/" && nextChar === "/") {
+    if (char === '/' && nextChar === '/') {
       const initialIndex = currentIndex;
       currentIndex += 2;
-      while (currentIndex < code.length && code[currentIndex] !== "\n") {
+      while (currentIndex < code.length && code[currentIndex] !== '\n') {
         currentIndex++;
       }
       // currentIndex is now at \n or end of code
       if (!skipComments) {
         const comment = code.substring(initialIndex, currentIndex);
         tokens.push({
-          type: "COMMENT_LINE",
+          type: 'COMMENT_LINE',
           value: comment,
         });
       }
@@ -187,35 +187,35 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     }
 
     // 3. Handle Compound Operators and Ranges (CHECK BEFORE SIMPLE ONES)
-    if (char === ":" && nextChar === "=") {
-      tokens.push({ type: "OPERATOR_ASSIGN", value: ":=" });
+    if (char === ':' && nextChar === '=') {
+      tokens.push({ type: 'OPERATOR_ASSIGN', value: ':=' });
       currentIndex += 2;
       continue;
     }
-    if (char === "<" && nextChar === "=") {
-      tokens.push({ type: "OPERATOR_LESS_EQUAL", value: "<=" });
+    if (char === '<' && nextChar === '=') {
+      tokens.push({ type: 'OPERATOR_LESS_EQUAL', value: '<=' });
       currentIndex += 2;
       continue;
     }
-    if (char === ">" && nextChar === "=") {
-      tokens.push({ type: "OPERATOR_GREATER_EQUAL", value: ">=" });
+    if (char === '>' && nextChar === '=') {
+      tokens.push({ type: 'OPERATOR_GREATER_EQUAL', value: '>=' });
       currentIndex += 2;
       continue;
     }
-    if (char === "<" && nextChar === ">") {
-      tokens.push({ type: "OPERATOR_NOT_EQUAL", value: "<>" });
+    if (char === '<' && nextChar === '>') {
+      tokens.push({ type: 'OPERATOR_NOT_EQUAL', value: '<>' });
       currentIndex += 2;
       continue;
     }
-    if (char === "." && nextChar === ".") {
-      tokens.push({ type: "OPERATOR_RANGE", value: ".." });
+    if (char === '.' && nextChar === '.') {
+      tokens.push({ type: 'OPERATOR_RANGE', value: '..' });
       currentIndex += 2;
       continue;
     }
 
     // 4. Handle String Literals (CHECK BEFORE IDENTIFIERS)
     if (char === "'") {
-      let stringValue = "";
+      let stringValue = '';
       let lookaheadIndex = currentIndex + 1; // Skip initial quote
       let closed = false;
       while (lookaheadIndex < code.length) {
@@ -237,9 +237,9 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
         }
       }
       if (!closed) {
-        fail("Unclosed string literal", currentIndex);
+        fail('Unclosed string literal', currentIndex);
       }
-      tokens.push({ type: "STRING_LITERAL", value: stringValue });
+      tokens.push({ type: 'STRING_LITERAL', value: stringValue });
       currentIndex = lookaheadIndex;
       continue;
     }
@@ -257,27 +257,27 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       const lowerCaseValue = value.toLowerCase();
       if (keywords.has(lowerCaseValue)) {
         // You could have specific types like 'BOOLEAN_LITERAL' if preferred
-        if (lowerCaseValue === "true" || lowerCaseValue === "false") {
-          tokens.push({ type: "BOOLEAN_LITERAL", value: value });
+        if (lowerCaseValue === 'true' || lowerCaseValue === 'false') {
+          tokens.push({ type: 'BOOLEAN_LITERAL', value: value });
         } else {
-          tokens.push({ type: "KEYWORD", value: value });
+          tokens.push({ type: 'KEYWORD', value: value });
         }
       } else {
-        tokens.push({ type: "IDENTIFIER", value: value });
+        tokens.push({ type: 'IDENTIFIER', value: value });
       }
       continue;
     }
 
     // 6. Handle Numbers (Integers and Reals)
-    if (digitRegex.test(char) || (char === "." && digitRegex.test(nextChar))) {
+    if (digitRegex.test(char) || (char === '.' && digitRegex.test(nextChar))) {
       // Allow starting with . for reals e.g. .5
-      let value = "";
+      let value = '';
       let isReal = false;
       let lookaheadIndex = currentIndex;
 
       // Allow starting with dot if followed by digit
-      if (code[lookaheadIndex] === ".") {
-        value += ".";
+      if (code[lookaheadIndex] === '.') {
+        value += '.';
         lookaheadIndex++;
         isReal = true;
       }
@@ -288,14 +288,14 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       }
 
       // Decimal part if didn't start with dot
-      if (!isReal && lookaheadIndex < code.length && code[lookaheadIndex] === ".") {
+      if (!isReal && lookaheadIndex < code.length && code[lookaheadIndex] === '.') {
         // Only treat the dot as a decimal point when a digit follows it. ISO Pascal
         // forbids a trailing dot ('5.' is the integer 5 followed by '.'), and '5..10'
         // is the integer 5 followed by the range operator: in both cases the dot is a
         // delimiter, not part of the number.
-        if (digitRegex.test(code[lookaheadIndex + 1] || "")) {
+        if (digitRegex.test(code[lookaheadIndex + 1] || '')) {
           isReal = true;
-          value += ".";
+          value += '.';
           lookaheadIndex++;
           // Read digits after dot
           while (lookaheadIndex < code.length && digitRegex.test(code[lookaheadIndex])) {
@@ -310,14 +310,14 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
 
       if (isReal) {
         // Make sure it's not just an isolated '.'
-        if (value !== ".") {
-          tokens.push({ type: "NUMBER_REAL", value: value });
+        if (value !== '.') {
+          tokens.push({ type: 'NUMBER_REAL', value: value });
         } else {
           // It was a simple '.', handle as delimiter below
           lookaheadIndex = currentIndex; // Reset to be detected by singleCharTokens
         }
       } else {
-        tokens.push({ type: "NUMBER_INTEGER", value: value });
+        tokens.push({ type: 'NUMBER_INTEGER', value: value });
       }
 
       // Only advance if we actually consumed a number
@@ -339,6 +339,6 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     fail(`Unknown character '${char}'`, currentIndex);
   }
 
-  tokens.push({ type: "EOF", value: "" });
+  tokens.push({ type: 'EOF', value: '' });
   return tokens;
 }

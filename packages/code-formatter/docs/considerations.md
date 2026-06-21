@@ -1,4 +1,5 @@
-When you have a label, for example: 
+When you have a label, for example:
+
 ```pascal
 program CompleteDeclarationsExample;
 
@@ -26,4 +27,5 @@ EndProgram: // End label
   // readln; // Uncomment to pause the console at the end if necessary
 end.
 ```
+
 You need to put the label at the start of the line.

@@ -29,12 +29,12 @@ source.pas → tokenizer → parser → compiler → output.js
                             └────→ code-formatter → pretty Pascal
 ```
 
-| Package (npm name) | Path | Role |
-|--------------------|------|------|
-| `pascal-tokenizer` | `packages/tokenizer` | Lexer: Pascal source → token stream. |
-| `pascal-parser` | `packages/parser` | Builds the AST from tokens. Depends on `pascal-tokenizer`. |
-| `pascal-js-compiler` | `packages/compiler` | Code generation: AST → JavaScript. Depends on `pascal-parser`. |
-| `pascal-code-formatter` | `packages/code-formatter` | Pretty-prints Pascal. Depends on `pascal-tokenizer`. |
+| Package (npm name)      | Path                      | Role                                                           |
+| ----------------------- | ------------------------- | -------------------------------------------------------------- |
+| `pascal-tokenizer`      | `packages/tokenizer`      | Lexer: Pascal source → token stream.                           |
+| `pascal-parser`         | `packages/parser`         | Builds the AST from tokens. Depends on `pascal-tokenizer`.     |
+| `pascal-js-compiler`    | `packages/compiler`       | Code generation: AST → JavaScript. Depends on `pascal-parser`. |
+| `pascal-code-formatter` | `packages/code-formatter` | Pretty-prints Pascal. Depends on `pascal-tokenizer`.           |
 
 **Dependency direction** (never import against it):
 `compiler → parser → tokenizer`, and `code-formatter → tokenizer`. Nothing
@@ -68,7 +68,7 @@ Two kinds of coupling exist; they are versioned differently on purpose.
   use a caret range (`^x.y.z`). They are released together through Changesets,
   so the workspace always resolves to a compatible sibling and the caret is
   safe and intended.
-- **Cross-repo deps** (libraries published from *other* repos — currently
+- **Cross-repo deps** (libraries published from _other_ repos — currently
   `counterweight-stack` and `objects-deep-compare`, consumed by
   `pascal-code-formatter`) are **pinned to an exact version** (no caret, no
   tilde). These come from a separate release train we do not control in this

@@ -4,6 +4,7 @@ Pending work, roughly in priority order. The toolchain already supports a usable
 procedural subset (see README); these extend it.
 
 ## Parser / language features
+
 - [x] **Local variables** in procedures/functions (the `Block` AST node now carries
       its own declarations). _Shipped in pascal-parser@0.2.0._
 - [x] **Arrays** — `array[lo..hi] of T`, indexing (1-based), assignment targets.
@@ -16,11 +17,13 @@ procedural subset (see README); these extend it.
       track line/column to produce meaningful parse-error messages.
 
 ## Compiler (pascal-js-compiler)
+
 - [ ] Honor `var` (by-reference) parameters — today they compile as by-value.
 - [ ] Map Pascal types to richer JS runtime where it matters (integer vs real division).
 - [ ] Optional source maps.
 
 ## Tooling / infra
+
 - [ ] **Publish to GitHub** + GitHub Actions CI (build, test, changesets release).
 - [ ] First npm release via Changesets (`pascal-parser` is unpublished; `pascal-js-compiler` is new).
 - [ ] **FPC conformance harness** — clone `FPCSource/tests/`, attempt to compile each
@@ -28,6 +31,7 @@ procedural subset (see README); these extend it.
       Best run as a multi-agent fan-out; shows exactly which features to add next.
 
 ## Cleanup
+
 - [ ] Archive the upstream single-package repos (`pascal-tokenizer`, `pascal-parser`,
       `pascal-code-formatter`) with a pointer to this monorepo — only after publishing.
 - [ ] The standalone `pascal-interpreter` repo is a stub (name collides with an

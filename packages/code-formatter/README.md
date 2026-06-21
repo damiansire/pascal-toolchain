@@ -21,7 +21,7 @@ npm install pascal-code-formatter
 Pass your Pascal code as a string to the formatPascalCode function. The function handles the tokenization internally.
 
 ```typescript
-import { formatPascalCode, FormattedPascalLine } from "pascal-code-formatter";
+import { formatPascalCode, FormattedPascalLine } from 'pascal-code-formatter';
 
 // Example Pascal code as a string
 const pascalCode: string = `
@@ -70,8 +70,8 @@ console.log(formattedLines);
 // And now... You can do anything you want, for example:
 // Iterate over the lines to reconstruct the formatted code
 formattedLines.forEach((line) => {
-  const indent = " ".repeat(line.indentation * 2); // Example indentation (adjust as needed)
-  const lineContent = line.tokens.map((token) => token.value).join(" ");
+  const indent = ' '.repeat(line.indentation * 2); // Example indentation (adjust as needed)
+  const lineContent = line.tokens.map((token) => token.value).join(' ');
   console.log(indent + lineContent);
 });
 ```

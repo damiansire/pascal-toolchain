@@ -1,8 +1,8 @@
-import { PascalToken } from "pascal-tokenizer";
-import { InternalFormattedPascalLine } from "../shared/types";
-import { WhiteSpace } from "../shared/elements";
-import { IdentationManager } from "./identation-manager";
-import { isEndOfLine, needWhiteSpace } from "../shared/libs";
+import { PascalToken } from 'pascal-tokenizer';
+import { InternalFormattedPascalLine } from '../shared/types';
+import { WhiteSpace } from '../shared/elements';
+import { IdentationManager } from './identation-manager';
+import { isEndOfLine, needWhiteSpace } from '../shared/libs';
 
 class FormatterController {
   private currentLineTokens: PascalToken[];
@@ -29,7 +29,7 @@ class FormatterController {
       this.addWhiteSpace();
     }
 
-    const finishLine = isEndOfLine(currentToken, nextToken)
+    const finishLine = isEndOfLine(currentToken, nextToken);
     if (finishLine) {
       this.finalizeLine();
     }

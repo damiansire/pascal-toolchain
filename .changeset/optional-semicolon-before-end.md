@@ -1,5 +1,5 @@
 ---
-"pascal-parser": patch
+'pascal-parser': patch
 ---
 
 El parser ahora trata `;` como separador y no como terminador: el punto y coma

@@ -1,5 +1,5 @@
-import { expectType, expectError, expectAssignable } from "tsd";
-import { parse, isValid } from "pascal-parser";
+import { expectType, expectError, expectAssignable } from 'tsd';
+import { parse, isValid } from 'pascal-parser';
 import type {
   Program,
   Statement,
@@ -7,19 +7,19 @@ import type {
   BinaryExpression,
   Identifier,
   ParseError,
-} from "pascal-parser";
+} from 'pascal-parser';
 
 // parse(source) -> Program; isValid(source) -> boolean.
-expectType<Program>(parse("program p; begin end."));
-expectType<boolean>(isValid("program p; begin end."));
+expectType<Program>(parse('program p; begin end.'));
+expectType<boolean>(isValid('program p; begin end.'));
 
 expectError(parse());
 expectError(parse(123));
 expectError(isValid(123));
 
 // A Program exposes a typed AST root with a literal `type` discriminant.
-const program = parse("program p; begin end.");
-expectType<"Program">(program.type);
+const program = parse('program p; begin end.');
+expectType<'Program'>(program.type);
 
 // AST node hierarchy: a BinaryExpression is assignable to Expression.
 declare const bin: BinaryExpression;

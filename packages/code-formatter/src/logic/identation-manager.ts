@@ -1,10 +1,10 @@
-import { CounterweightStack, CounterweightRule } from "counterweight-stack";
-import { deepEqual } from "objects-deep-compare";
-import { PascalToken } from "pascal-tokenizer";
+import { CounterweightStack, CounterweightRule } from 'counterweight-stack';
+import { deepEqual } from 'objects-deep-compare';
+import { PascalToken } from 'pascal-tokenizer';
 
-const beginToken: PascalToken = { type: "KEYWORD", value: "begin" };
-const endToken: PascalToken = { type: "KEYWORD", value: "end" };
-const varToken: PascalToken = { type: "KEYWORD", value: "var" };
+const beginToken: PascalToken = { type: 'KEYWORD', value: 'begin' };
+const endToken: PascalToken = { type: 'KEYWORD', value: 'end' };
+const varToken: PascalToken = { type: 'KEYWORD', value: 'var' };
 
 const rules: CounterweightRule<PascalToken>[] = [
   {
@@ -23,7 +23,7 @@ const rules: CounterweightRule<PascalToken>[] = [
  * Canonicalize keyword values to lower-case before any comparison or stack op.
  */
 const canonicalize = (token: PascalToken): PascalToken =>
-  token.type === "KEYWORD" ? { ...token, value: token.value.toLowerCase() } : token;
+  token.type === 'KEYWORD' ? { ...token, value: token.value.toLowerCase() } : token;
 
 class IdentationManager {
   private indentationStack: CounterweightStack<PascalToken>;
@@ -35,8 +35,8 @@ class IdentationManager {
     let currentIndent = this.indentationStack.size();
     for (const token of canonical) {
       const result = this.indentationStack.pop(token);
-      if (result?.type === "KEYWORD") {
-        if (result?.value === "var") {
+      if (result?.type === 'KEYWORD') {
+        if (result?.value === 'var') {
           currentIndent = 0;
         }
       }
