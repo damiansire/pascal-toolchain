@@ -16,7 +16,7 @@ class PascalFormatter {
     if (this.options.ignoreEOF) {
       tokens = tokens.filter(x => x.type !== "EOF")
     }
-    let cleanedTokens = cleanTokens(tokens)
+    const cleanedTokens = cleanTokens(tokens)
     this.formatterController = new FormatterController(cleanedTokens);
     this.stackHistory = new CounterweightStack(StructuralElementsWeightRules);
   }
