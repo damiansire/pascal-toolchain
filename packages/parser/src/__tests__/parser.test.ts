@@ -53,6 +53,20 @@ end.`;
       expect(isValid(source)).toBe(true);
     });
 
+    it('should accept a program whose last statement has no trailing semicolon', () => {
+      // ';' is a separator in Pascal, so it is optional before 'end'.
+      const source = `
+program NoTrailingSemicolon;
+begin
+    writeln('a');
+    writeln('b')
+end.`;
+
+      expect(isValid(source)).toBe(true);
+      const ast = parse(source);
+      expect(ast.statements).toHaveLength(2);
+    });
+
     describe('Error cases', () => {
       it('should fail when program keyword is missing', () => {
         const source = `
@@ -119,11 +133,14 @@ end.`;
         expect(isValid(source)).toBe(false);
       });
 
-      it('should fail when statement semicolon is missing', () => {
+      it('should fail when a separator is missing between two statements', () => {
+        // A trailing ';' before 'end' is optional, but two statements still
+        // need a ';' separator between them.
         const source = `
 program HelloWorld;
 begin
-    writeln('Hello, World!')
+    writeln('a')
+    writeln('b')
 end.`;
 
         expect(() => parse(source)).toThrow(ParseError);

@@ -285,7 +285,11 @@ class Parser {
     const statements: Statement[] = [];
     while (!this.isAtEnd() && !this.checkKeyword('end')) {
       statements.push(this.parseStatement());
-      this.consume('DELIMITER_SEMICOLON', "Expected ';' after statement");
+      // In Pascal ';' is a statement separator, not a terminator: it is
+      // optional before the block closer ('end'/'until'). Consume it when
+      // present and keep going; otherwise stop and let the caller match the
+      // closing keyword.
+      if (!this.match('DELIMITER_SEMICOLON')) break;
     }
     return statements;
   }
