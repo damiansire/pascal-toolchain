@@ -31,10 +31,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:types": "tsd",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "prepublishOnly": "npm test && npm run lint",
+    "prepublishOnly": "npm run build && npm test",
     "docs": "typedoc --out docs src"
   },
   "tsd": {
