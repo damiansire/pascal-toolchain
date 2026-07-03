@@ -23,6 +23,12 @@ const isStatement = (type: LineType): boolean => {
 };
 
 const isEndOfLine = (currentToken: PascalToken, nextToken: PascalToken): boolean => {
+  // No next token means the current one closes the line. Guard first so no branch
+  // below dereferences an undefined nextToken (e.g. `end` as the last real token
+  // once the EOF sentinel is filtered out by ignoreEOF).
+  if (nextToken === undefined) {
+    return true;
+  }
   if (isComment(nextToken)) {
     return false;
   }
@@ -42,9 +48,6 @@ const isEndOfLine = (currentToken: PascalToken, nextToken: PascalToken): boolean
         return true;
       }
     }
-  }
-  if (nextToken === undefined) {
-    return true;
   }
   if (nextToken.type === 'EOF') {
     return true;
