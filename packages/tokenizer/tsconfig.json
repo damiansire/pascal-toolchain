@@ -4,6 +4,6 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src/tokenizer.ts", "src/index.ts", "src/example.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/tokenizer.ts", "src/index.ts"],
+  "exclude": ["node_modules", "dist", "**/__tests__/**"]
 }
