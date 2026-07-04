@@ -42,7 +42,7 @@ class PascalFormatter {
       const prevLine = this.cleanFormattedLines.at(-1);
       const currentLine = this.convertToFormattedLine(formattedLines[index]);
 
-      const addEmptyLine = needAddEmptyLine(this.stackHistory, prevLine, currentLine);
+      const addEmptyLine = needAddEmptyLine(prevLine, currentLine);
       if (addEmptyLine) {
         this.addToFormattedLine(EmptyLine);
       }

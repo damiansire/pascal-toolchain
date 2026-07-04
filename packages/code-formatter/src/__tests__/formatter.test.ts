@@ -112,7 +112,7 @@ describe('formatPascalCode', () => {
 
   test('indentation is case-insensitive: UPPERCASE keywords indent like lowercase ones', () => {
     // Pascal is case-insensitive; VAR/BEGIN/END must drive indentation exactly
-    // like var/begin/end. Compare the indentation sequence (the IdentationManager's
+    // like var/begin/end. Compare the indentation sequence (the IndentationTracker's
     // job), ignoring the preserved token casing in the output.
     const lower = 'program Test; var x: integer; y: integer; begin end.';
     const upper = 'PROGRAM Test; VAR x: INTEGER; y: INTEGER; BEGIN END.';

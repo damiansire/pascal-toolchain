@@ -26,12 +26,22 @@ const rules: CounterweightRule<PascalToken>[] = [
 const canonicalize = (token: PascalToken): PascalToken =>
   token.type === 'KEYWORD' ? { ...token, value: token.value.toLowerCase() } : token;
 
-class IdentationManager {
+/**
+ * Tracks Pascal nesting depth across the lines of a program. It is intentionally
+ * stateful: `indentationForLine` advances an internal begin/end/var stack as it
+ * consumes each line, so it must be called once per line in source order.
+ */
+class IndentationTracker {
   private indentationStack: CounterweightStack<PascalToken>;
   constructor() {
     this.indentationStack = new CounterweightStack<PascalToken>(rules);
   }
-  evaluateLineIndentation(tokens: FormatterToken[]) {
+  /**
+   * Returns the indentation level for `tokens` and advances the internal nesting
+   * stack. Stateful by design (not a pure function): later lines depend on the
+   * begin/end/var tokens consumed from earlier ones.
+   */
+  indentationForLine(tokens: FormatterToken[]) {
     // Indentation is driven only by real keywords; drop the synthetic whitespace markers.
     const real = tokens.filter((t): t is PascalToken => t.type !== 'WHITESPACE');
     const canonical = real.map(canonicalize);
@@ -56,4 +66,4 @@ class IdentationManager {
   }
 }
 
-export { IdentationManager };
+export { IndentationTracker };

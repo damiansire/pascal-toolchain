@@ -1,18 +1,18 @@
 import { PascalToken } from 'pascal-tokenizer';
 import { FormatterToken, InternalFormattedPascalLine } from '../shared/types';
 import { WhiteSpace } from '../shared/elements';
-import { IdentationManager } from './identation-manager';
+import { IndentationTracker } from './indentation-tracker';
 import { isEndOfLine, needWhiteSpace } from '../shared/libs';
 
 class FormatterController {
   private currentLineTokens: FormatterToken[];
   private formattedLines: InternalFormattedPascalLine[];
-  private indentationManager: IdentationManager;
+  private indentationTracker: IndentationTracker;
 
   constructor(tokens: PascalToken[]) {
     this.currentLineTokens = [];
     this.formattedLines = [];
-    this.indentationManager = new IdentationManager();
+    this.indentationTracker = new IndentationTracker();
 
     for (let index = 0; index < tokens.length; index++) {
       const currentToken = tokens[index];
@@ -41,7 +41,7 @@ class FormatterController {
 
   private finalizeLine(): void {
     if (this.currentLineTokens.length > 0) {
-      const deepLine = this.indentationManager.evaluateLineIndentation(this.currentLineTokens);
+      const deepLine = this.indentationTracker.indentationForLine(this.currentLineTokens);
       this.formattedLines.push({
         tokens: [...this.currentLineTokens],
         indentation: deepLine,

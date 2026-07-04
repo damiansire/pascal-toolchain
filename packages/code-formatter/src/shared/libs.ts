@@ -176,7 +176,6 @@ const getLineType = (tokens: FormatterToken[]): LineType => {
 };
 
 const needAddEmptyLine = (
-  _history: CounterweightStack<StructuralType>,
   prevLine: FormattedPascalLine | undefined,
   currentLine: FormattedPascalLine,
 ) => {
