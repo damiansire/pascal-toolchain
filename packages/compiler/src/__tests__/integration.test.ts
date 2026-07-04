@@ -211,4 +211,69 @@ begin
 end.`);
     expect(output).toEqual(['two or three']);
   });
+
+  it('evaluates real boolean and/or/not (not just the integer-rejection path)', () => {
+    const output = run(`
+program Bools;
+var
+    n: integer;
+begin
+    n := 5;
+    if (n > 0) and (n < 10) then
+        writeln('and');
+    if (n < 0) or (n > 3) then
+        writeln('or');
+    if not (n = 0) then
+        writeln('not');
+end.`);
+    expect(output).toEqual(['and', 'or', 'not']);
+  });
+
+  it('supports real division (/) and real literals', () => {
+    const output = run(`
+program Reals;
+var
+    x: real;
+begin
+    x := 10 / 4;
+    writeln(x);
+    writeln(3.14);
+end.`);
+    expect(output).toEqual([2.5, 3.14]);
+  });
+
+  it('supports the sqrt/trunc/round/odd builtins', () => {
+    const output = run(`
+program MoreBuiltins;
+begin
+    writeln(sqrt(9));
+    writeln(trunc(2.9));
+    writeln(round(2.6));
+    writeln(odd(3));
+    writeln(odd(4));
+end.`);
+    expect(output).toEqual([3, 2, 3, true, false]);
+  });
+
+  it('write (no newline) coerces each argument with String()', () => {
+    const chunks: string[] = [];
+    const spy = jest
+      .spyOn(process.stdout, 'write')
+      .mockImplementation((chunk: string | Uint8Array): boolean => {
+        chunks.push(String(chunk));
+        return true;
+      });
+    try {
+      const js = compile(`program W;
+begin
+    write('x');
+    write(42);
+    write(true);
+end.`);
+      new Function(js)();
+    } finally {
+      spy.mockRestore();
+    }
+    expect(chunks.join('')).toBe('x42true');
+  });
 });
