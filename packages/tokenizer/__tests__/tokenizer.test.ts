@@ -1,5 +1,5 @@
 // tokenizer.test.ts
-import { tokenizePascal, PascalToken } from '../src/index'; // Asegúrate que la ruta sea correcta
+import { tokenizePascal, PascalToken, TokenizeError } from '../src/index'; // Asegúrate que la ruta sea correcta
 
 describe('tokenizePascal', () => {
   // Test básico con palabras clave e identificadores
@@ -199,6 +199,21 @@ describe('tokenizePascal', () => {
     expect(() => tokenizePascal('a := 3 $ 4')).toThrow(
       /Unknown character '\$' at line 1, column 8/,
     );
+  });
+
+  it('throws a typed TokenizeError carrying line and column', () => {
+    let caught: unknown;
+    try {
+      tokenizePascal("x := 'oops");
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(TokenizeError);
+    expect(caught).toBeInstanceOf(Error);
+    const err = caught as TokenizeError;
+    expect(err.name).toBe('TokenizeError');
+    expect(err.line).toBe(1);
+    expect(err.column).toBe(6);
   });
 
   it('To complex code', () => {

@@ -25,7 +25,7 @@ import {
   IndexExpression,
   SourceLocation,
 } from './types';
-import { tokenizePascal, PascalToken, TokenType } from 'pascal-tokenizer';
+import { tokenizePascal, PascalToken, TokenType, TokenizeError } from 'pascal-tokenizer';
 
 /** Symbol-operator tokens mapped to their Pascal spelling. */
 const SYMBOL_OPERATORS: Partial<Record<TokenType, string>> = {
@@ -676,9 +676,11 @@ export function isValid(source: string): boolean {
     parse(source);
     return true;
   } catch (e) {
-    // Only a genuine parse failure means "not valid Pascal". Any other error
-    // (a bug, an unexpected RangeError, etc.) must surface, not be masked.
-    if (e instanceof ParseError) return false;
+    // A parse failure OR a lexical failure both mean "not valid Pascal": the
+    // parser tokenizes eagerly in its constructor, so an unterminated string or
+    // unknown character surfaces as a TokenizeError before parsing begins. Any
+    // other error (a bug, an unexpected RangeError, etc.) must surface, not be masked.
+    if (e instanceof ParseError || e instanceof TokenizeError) return false;
     throw e;
   }
 }

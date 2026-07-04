@@ -44,6 +44,23 @@ export interface PascalToken {
   value: string;
 }
 
+/**
+ * Error thrown when the source cannot be tokenized (unterminated string/comment,
+ * unknown character). Typed so callers can distinguish a lexically invalid input
+ * from a genuine bug — e.g. the parser's `isValid` treats it as "not valid Pascal"
+ * rather than letting it escape as an anonymous Error.
+ */
+export class TokenizeError extends Error {
+  constructor(
+    message: string,
+    public readonly line: number,
+    public readonly column: number,
+  ) {
+    super(message);
+    this.name = 'TokenizeError';
+  }
+}
+
 export function tokenizePascal(code: string, skipComments: boolean = true) {
   const tokens: Array<PascalToken> = [];
   let currentIndex = 0;
@@ -54,7 +71,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     const upTo = code.slice(0, index);
     const line = upTo.split('\n').length;
     const column = index - upTo.lastIndexOf('\n');
-    throw new Error(`${message} at line ${line}, column ${column}`);
+    throw new TokenizeError(`${message} at line ${line}, column ${column}`, line, column);
   };
 
   // Common Pascal keywords (case-insensitive)

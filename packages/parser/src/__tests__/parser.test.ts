@@ -1,4 +1,5 @@
 import { parse, isValid } from '../parser';
+import { TokenizeError } from 'pascal-tokenizer';
 import {
   ParseError,
   IfStatement,
@@ -152,6 +153,24 @@ begin
 end.`;
 
         expect(() => parse(source)).toThrow(ParseError);
+        expect(isValid(source)).toBe(false);
+      });
+    });
+
+    describe('Lexically invalid input', () => {
+      // The parser tokenizes eagerly in its constructor, so a lexical error
+      // surfaces as a TokenizeError before parsing. isValid must treat that as
+      // "not valid Pascal" (return false), not let the exception escape.
+      it('isValid returns false for an unterminated string (does not throw)', () => {
+        const source = `program p; begin c := 'sin cerrar; end.`;
+        expect(() => isValid(source)).not.toThrow();
+        expect(isValid(source)).toBe(false);
+        expect(() => parse(source)).toThrow(TokenizeError);
+      });
+
+      it('isValid returns false for an unknown character (does not throw)', () => {
+        const source = `program p; begin x := 1 ` + '`' + ` 2; end.`;
+        expect(() => isValid(source)).not.toThrow();
         expect(isValid(source)).toBe(false);
       });
     });
