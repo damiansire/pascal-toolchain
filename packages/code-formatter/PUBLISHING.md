@@ -1,63 +1,20 @@
-# Publishing to npm
+# Publishing
 
-This document provides instructions for publishing the pascal-tokenizer package to the npm registry.
+`pascal-code-formatter` is **not** published by hand. Versioning and publishing
+for every package in this monorepo are driven by [Changesets](https://github.com/changesets/changesets)
+through CI — see the **Releasing** section of the repo-root [`AGENTS.md`](../../AGENTS.md).
 
-## Prerequisites
+Do **not** run `npm version` or `npm publish` locally: that would bypass the
+verified pipeline (lint, build, ordered test, type-tests) and desync the version
+bumps that Changesets coordinates across sibling packages.
 
-1. You need an npm account. If you don't have one, create it at [npmjs.com](https://www.npmjs.com/signup).
-2. You need to be logged in to npm in your terminal:
+## To ship a change
+
+1. Describe the user-facing change and its bump:
    ```bash
-   npm login
+   npm run changeset
    ```
-
-## Before Publishing
-
-1. Make sure all your changes are committed to your version control system (e.g., git).
-2. Update the version number in `package.json` if needed:
-   ```bash
-   npm version patch  # for bug fixes
-   npm version minor  # for new features
-   npm version major  # for breaking changes
-   ```
-3. Build the package to make sure everything compiles correctly:
-   ```bash
-   npm run build
-   ```
-4. Test the package locally:
-   ```bash
-   # Compile and run the example
-   npx tsc example.ts
-   node example.js
-   ```
-
-## Publishing
-
-Once you're ready to publish:
-
-```bash
-npm publish
-```
-
-The `prepublishOnly` script in `package.json` will automatically run the build process before publishing.
-
-## After Publishing
-
-1. Create a git tag for the version:
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
-2. Update the README or documentation if needed.
-
-## Unpublishing
-
-If you need to unpublish a version (only possible within 72 hours of publishing):
-
-```bash
-npm unpublish pascal-code-formatter@1.0.0
-```
-
-## Resources
-
-- [npm Documentation](https://docs.npmjs.com/)
-- [npm Publishing Packages](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry)
+2. Commit the generated `.changeset/*.md` with your change and open a PR.
+3. When it merges, the release workflow opens a **Version Packages** PR that
+   applies the bumps and updates changelogs. Merging that PR publishes the
+   affected packages to npm and tags the release automatically.
