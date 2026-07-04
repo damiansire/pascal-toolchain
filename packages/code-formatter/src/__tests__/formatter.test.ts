@@ -232,6 +232,18 @@ describe('fragments degrade gracefully (no crash)', () => {
   });
 });
 
+describe('spacing is case-insensitive (needWhiteSpace normalizes keywords)', () => {
+  // if/then/program drive spacing; the tokenizer preserves casing, so uppercase
+  // keywords must produce the same whitespace layout as lowercase ones.
+  test('IF/THEN/PROGRAM in uppercase keep the same spacing as lowercase', () => {
+    const lower = 'program Test; begin if x then y := 1; end.';
+    const upper = 'PROGRAM Test; BEGIN IF x THEN y := 1; END.';
+    const typeShape = (code: string) =>
+      formatPascalCode(code).map((line) => line.tokens?.map((t) => t.type) ?? []);
+    expect(typeShape(upper)).toEqual(typeShape(lower));
+  });
+});
+
 describe('one line test', () => {
   const input = `if temperaturaActual > 25 then (* Comprueba si la temperatura supera los 25 grados *) begin writeln('¡Hace calor! Enciende el aire acondicionado.'); (* Acción si hace calor *) end else begin writeln('Temperatura agradable. Aire acondicionado apagado'); (* Acción si no hace calor *) end.`;
   const result = formatPascalCode(input);

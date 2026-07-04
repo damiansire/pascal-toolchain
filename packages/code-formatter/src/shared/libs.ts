@@ -61,15 +61,18 @@ const needWhiteSpace = (currentToken: PascalToken, nextToken: PascalToken) => {
     return false;
   }
 
-  if (nextToken.type === 'KEYWORD' && nextToken.value === 'then') {
+  // Pascal is case-insensitive and the tokenizer preserves the original casing,
+  // so keyword checks must normalize (like getLineType/isEndOfLine already do);
+  // otherwise IF/THEN/PROGRAM in uppercase silently lose their spacing.
+  if (nextToken.type === 'KEYWORD' && nextToken.value.toLowerCase() === 'then') {
     return true;
   }
 
   if (currentToken.type === 'KEYWORD') {
-    if (currentToken.value === 'program') {
+    if (currentToken.value.toLowerCase() === 'program') {
       return true;
     }
-    if (currentToken.value === 'if') {
+    if (currentToken.value.toLowerCase() === 'if') {
       return true;
     }
   }
