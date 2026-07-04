@@ -1,8 +1,8 @@
 import { PascalToken, TokenType } from 'pascal-tokenizer';
-export { PascalToken, TokenType };
+export type { PascalToken, TokenType };
 
 import { FormattedPascalLine, FormatterToken } from './shared/types';
-export { FormattedPascalLine, FormatterToken };
+export type { FormattedPascalLine, FormatterToken };
 
 import { formatPascalCode } from './formatter';
 export { formatPascalCode };

@@ -16,12 +16,13 @@ class FormatterController {
 
     for (let index = 0; index < tokens.length; index++) {
       const currentToken = tokens[index];
-      const nextToken = tokens[index + 1];
+      if (currentToken === undefined) continue; // unreachable given the bound; satisfies the checker
+      const nextToken = tokens[index + 1]; // undefined at the last token (no lookahead)
       this.processToken(currentToken, nextToken);
     }
   }
 
-  private processToken(currentToken: PascalToken, nextToken: PascalToken) {
+  private processToken(currentToken: PascalToken, nextToken: PascalToken | undefined) {
     this.addTokenToCurrentLine(currentToken);
 
     const addWhiteSpace = needWhiteSpace(currentToken, nextToken);

@@ -22,7 +22,7 @@ const isStatement = (type: LineType): boolean => {
   return ['IF_STATEMENT', 'WHILE_STATEMENT', 'REPEAT_STATEMENT', 'FOR_STATEMENT'].includes(type);
 };
 
-const isEndOfLine = (currentToken: PascalToken, nextToken: PascalToken): boolean => {
+const isEndOfLine = (currentToken: PascalToken, nextToken: PascalToken | undefined): boolean => {
   // No next token means the current one closes the line. Guard first so no branch
   // below dereferences an undefined nextToken (e.g. `end` as the last real token
   // once the EOF sentinel is filtered out by ignoreEOF).
@@ -56,7 +56,7 @@ const isEndOfLine = (currentToken: PascalToken, nextToken: PascalToken): boolean
   return false;
 };
 
-const needWhiteSpace = (currentToken: PascalToken, nextToken: PascalToken) => {
+const needWhiteSpace = (currentToken: PascalToken, nextToken: PascalToken | undefined) => {
   if (!nextToken) {
     return false;
   }

@@ -35,12 +35,18 @@ class PascalFormatter {
       return [];
     }
 
-    const newLine = this.convertToFormattedLine(formattedLines[0]);
+    const firstLine = formattedLines[0];
+    if (firstLine === undefined) {
+      return [];
+    }
+    const newLine = this.convertToFormattedLine(firstLine);
     this.addToFormattedLine(newLine);
 
     for (let index = 1; index < formattedLines.length; index++) {
+      const internalLine = formattedLines[index];
+      if (internalLine === undefined) continue; // unreachable given the bound; satisfies the checker
       const prevLine = this.cleanFormattedLines.at(-1);
-      const currentLine = this.convertToFormattedLine(formattedLines[index]);
+      const currentLine = this.convertToFormattedLine(internalLine);
 
       const addEmptyLine = needAddEmptyLine(prevLine, currentLine);
       if (addEmptyLine) {

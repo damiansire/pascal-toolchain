@@ -78,11 +78,22 @@ class Parser {
   // ---- token helpers -----------------------------------------------------
 
   private peek(): PascalToken {
-    return this.tokens[this.current];
+    // The token stream always ends with an EOF sentinel and advance() never steps
+    // past it, so this is defined in practice; guard anyway to satisfy
+    // noUncheckedIndexedAccess and surface any invariant break as a ParseError.
+    const token = this.tokens[this.current];
+    if (token === undefined) {
+      throw new ParseError('Unexpected end of token stream');
+    }
+    return token;
   }
 
   private previous(): PascalToken {
-    return this.tokens[this.current - 1];
+    const token = this.tokens[this.current - 1];
+    if (token === undefined) {
+      throw new ParseError('No previous token');
+    }
+    return token;
   }
 
   private isAtEnd(): boolean {
@@ -199,7 +210,8 @@ class Parser {
           type: 'VariableDeclaration',
           name,
           varType,
-          arrayBounds,
+          // omit when absent (exactOptionalPropertyTypes): a scalar var has no bounds
+          ...(arrayBounds !== undefined && { arrayBounds }),
           location: this.location(),
         });
       }
@@ -250,7 +262,8 @@ class Parser {
       type: isFunction ? 'FunctionDeclaration' : 'ProcedureDeclaration',
       name: nameToken.value,
       parameters,
-      returnType,
+      // omit for procedures (exactOptionalPropertyTypes): only functions return
+      ...(returnType !== undefined && { returnType }),
       body,
       location: this.location(),
     };
@@ -354,7 +367,13 @@ class Parser {
       this.advance();
       elseBranch = this.parseStatement();
     }
-    return { type: 'IfStatement', condition, thenBranch, elseBranch, location: this.location() };
+    return {
+      type: 'IfStatement',
+      condition,
+      thenBranch,
+      ...(elseBranch !== undefined && { elseBranch }),
+      location: this.location(),
+    };
   }
 
   private parseRepeat(): RepeatStatement {
@@ -396,7 +415,13 @@ class Parser {
     }
 
     this.consumeKeyword('end', "Expected 'end' to close case statement");
-    return { type: 'CaseStatement', expression, clauses, elseBranch, location: this.location() };
+    return {
+      type: 'CaseStatement',
+      expression,
+      clauses,
+      ...(elseBranch !== undefined && { elseBranch }),
+      location: this.location(),
+    };
   }
 
   private parseWhile(): WhileStatement {

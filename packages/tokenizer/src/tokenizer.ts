@@ -138,8 +138,10 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
   const identifierCharRegex = /[a-z0-9_]/i; // Allows _
 
   while (currentIndex < code.length) {
-    const char = code[currentIndex];
-    const nextChar = code[currentIndex + 1] || ''; // Simple lookahead
+    // charAt returns '' past the end (never undefined), so callers stay string-typed
+    // under noUncheckedIndexedAccess without an unchecked index assertion.
+    const char = code.charAt(currentIndex);
+    const nextChar = code.charAt(currentIndex + 1); // Simple lookahead
 
     // 1. Ignore Whitespace
     if (whitespaceRegex.test(char)) {
@@ -264,8 +266,8 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     if (letterRegex.test(char)) {
       let value = char;
       let lookaheadIndex = currentIndex + 1;
-      while (lookaheadIndex < code.length && identifierCharRegex.test(code[lookaheadIndex])) {
-        value += code[lookaheadIndex];
+      while (lookaheadIndex < code.length && identifierCharRegex.test(code.charAt(lookaheadIndex))) {
+        value += code.charAt(lookaheadIndex);
         lookaheadIndex++;
       }
       currentIndex = lookaheadIndex;
@@ -292,30 +294,30 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       let lookaheadIndex = currentIndex;
 
       // Allow starting with dot if followed by digit
-      if (code[lookaheadIndex] === '.') {
+      if (code.charAt(lookaheadIndex) === '.') {
         value += '.';
         lookaheadIndex++;
         isReal = true;
       }
 
-      while (lookaheadIndex < code.length && digitRegex.test(code[lookaheadIndex])) {
-        value += code[lookaheadIndex];
+      while (lookaheadIndex < code.length && digitRegex.test(code.charAt(lookaheadIndex))) {
+        value += code.charAt(lookaheadIndex);
         lookaheadIndex++;
       }
 
       // Decimal part if didn't start with dot
-      if (!isReal && lookaheadIndex < code.length && code[lookaheadIndex] === '.') {
+      if (!isReal && lookaheadIndex < code.length && code.charAt(lookaheadIndex) === '.') {
         // Only treat the dot as a decimal point when a digit follows it. ISO Pascal
         // forbids a trailing dot ('5.' is the integer 5 followed by '.'), and '5..10'
         // is the integer 5 followed by the range operator: in both cases the dot is a
         // delimiter, not part of the number.
-        if (digitRegex.test(code[lookaheadIndex + 1] || '')) {
+        if (digitRegex.test(code.charAt(lookaheadIndex + 1))) {
           isReal = true;
           value += '.';
           lookaheadIndex++;
           // Read digits after dot
-          while (lookaheadIndex < code.length && digitRegex.test(code[lookaheadIndex])) {
-            value += code[lookaheadIndex];
+          while (lookaheadIndex < code.length && digitRegex.test(code.charAt(lookaheadIndex))) {
+            value += code.charAt(lookaheadIndex);
             lookaheadIndex++;
           }
         }
@@ -345,8 +347,9 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     }
 
     // 7. Handle Simple Operators/Delimiters (Last option)
-    if (Object.prototype.hasOwnProperty.call(singleCharTokens, char)) {
-      tokens.push({ type: singleCharTokens[char], value: char });
+    const singleType = singleCharTokens[char];
+    if (singleType !== undefined) {
+      tokens.push({ type: singleType, value: char });
       currentIndex++;
       continue;
     }
