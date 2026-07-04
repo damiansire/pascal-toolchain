@@ -14,23 +14,8 @@ import {
   Declaration,
   Block,
   Statement,
-  AssignmentStatement,
-  IfStatement,
-  WhileStatement,
-  ForStatement,
-  RepeatStatement,
-  CaseStatement,
   CallStatement,
-  CompoundStatement,
   Expression,
-  BinaryExpression,
-  UnaryExpression,
-  Identifier,
-  NumericLiteral,
-  StringLiteral,
-  BooleanLiteral,
-  CallExpression,
-  IndexExpression,
 } from 'pascal-parser';
 
 /** Options controlling the generated output. */
@@ -157,7 +142,7 @@ class CodeGenerator {
         return lines;
       }
       default:
-        throw new Error(`Unsupported declaration: ${(declaration as Declaration).type}`);
+        throw new Error(`Unsupported declaration: ${declaration.type}`);
     }
   }
 
@@ -189,11 +174,20 @@ class CodeGenerator {
     return lines;
   }
 
+  /**
+   * Compile-time exhaustiveness guard: the discriminated unions make `node` narrow
+   * to `never` once every case is handled, so an unhandled variant is a build error
+   * here rather than a silently dropped statement/expression at runtime.
+   */
+  private assertNever(node: never, kind: string): never {
+    throw new Error(`Unsupported ${kind}: ${(node as { type: string }).type}`);
+  }
+
   /** Emits the statements of a body (then/else/loop body) without braces. */
   private genBody(statement: Statement, level: number): string[] {
     if (statement.type === 'CompoundStatement') {
       const lines: string[] = [];
-      for (const inner of (statement as CompoundStatement).statements) {
+      for (const inner of statement.statements) {
         lines.push(...this.genStatement(inner, level));
       }
       return lines;
@@ -205,7 +199,7 @@ class CodeGenerator {
     const pad = this.pad(level);
     switch (statement.type) {
       case 'AssignmentStatement': {
-        const s = statement as AssignmentStatement;
+        const s = statement;
         // Assignment to the enclosing function's name is a return value.
         if (
           this.currentFunction &&
@@ -217,7 +211,7 @@ class CodeGenerator {
         return [`${pad}${this.genExpression(s.left)} = ${this.genExpression(s.right)};`];
       }
       case 'IfStatement': {
-        const s = statement as IfStatement;
+        const s = statement;
         const lines = [`${pad}if (${this.genExpression(s.condition)}) {`];
         lines.push(...this.genBody(s.thenBranch, level + 1));
         if (s.elseBranch) {
@@ -228,14 +222,14 @@ class CodeGenerator {
         return lines;
       }
       case 'WhileStatement': {
-        const s = statement as WhileStatement;
+        const s = statement;
         const lines = [`${pad}while (${this.genExpression(s.condition)}) {`];
         lines.push(...this.genBody(s.body, level + 1));
         lines.push(`${pad}}`);
         return lines;
       }
       case 'ForStatement': {
-        const s = statement as ForStatement;
+        const s = statement;
         const v = this.genExpression(s.variable);
         const op = s.direction === 'to' ? '<=' : '>=';
         const step = s.direction === 'to' ? '++' : '--';
@@ -253,7 +247,7 @@ class CodeGenerator {
         return lines;
       }
       case 'RepeatStatement': {
-        const s = statement as RepeatStatement;
+        const s = statement;
         const lines = [`${pad}do {`];
         for (const inner of s.body) lines.push(...this.genStatement(inner, level + 1));
         // repeat..until loops *until* the condition holds → while not condition.
@@ -261,7 +255,7 @@ class CodeGenerator {
         return lines;
       }
       case 'CaseStatement': {
-        const s = statement as CaseStatement;
+        const s = statement;
         const lines = [`${pad}switch (${this.genExpression(s.expression)}) {`];
         for (const clause of s.clauses) {
           for (const label of clause.labels) {
@@ -281,10 +275,10 @@ class CodeGenerator {
         return this.genBody(statement, level);
       }
       case 'CallStatement': {
-        return [this.genCall(statement as CallStatement, pad)];
+        return [this.genCall(statement, pad)];
       }
       default:
-        throw new Error(`Unsupported statement: ${statement.type}`);
+        return this.assertNever(statement, 'statement');
     }
   }
 
@@ -359,7 +353,7 @@ class CodeGenerator {
   private genExpression(expression: Expression): string {
     switch (expression.type) {
       case 'BinaryExpression': {
-        const e = expression as BinaryExpression;
+        const e = expression;
         const op = e.operator.toLowerCase();
         // and/or are lowered to the boolean operators &&/||. Pascal also overloads
         // them bitwise over integers ('12 and 10' = 8), which this subset does NOT
@@ -381,7 +375,7 @@ class CodeGenerator {
         return `(${left} ${this.mapBinary(e.operator)} ${right})`;
       }
       case 'UnaryExpression': {
-        const e = expression as UnaryExpression;
+        const e = expression;
         // 'not' is lowered to '!'. Pascal's bitwise 'not' over integers ('not 0' = -1)
         // is not supported by this boolean-only subset; reject clearly-integer operands.
         if (e.operator.toLowerCase() === 'not' && this.isIntegerExpression(e.argument)) {
@@ -390,34 +384,34 @@ class CodeGenerator {
         return `(${this.mapUnary(e.operator)}${this.genExpression(e.argument)})`;
       }
       case 'Identifier':
-        return this.mapIdentifier((expression as Identifier).name);
+        return this.mapIdentifier(expression.name);
       case 'NumericLiteral':
-        return String((expression as NumericLiteral).value);
+        return String(expression.value);
       case 'StringLiteral':
         // Re-quote: the tokenizer strips the surrounding quotes.
-        return JSON.stringify((expression as StringLiteral).value);
+        return JSON.stringify(expression.value);
       case 'BooleanLiteral':
-        return (expression as BooleanLiteral).value ? 'true' : 'false';
+        return expression.value ? 'true' : 'false';
       case 'CallExpression': {
-        const e = expression as CallExpression;
+        const e = expression;
         const args = e.arguments.map((a) => this.genExpression(a));
         const builtin = this.genBuiltinCall(e.callee, args);
         return builtin ?? `${this.mapIdentifier(e.callee)}(${args.join(', ')})`;
       }
       case 'IndexExpression': {
-        const e = expression as IndexExpression;
+        const e = expression;
         const arr = this.genExpression(e.array);
         const idx = this.genExpression(e.index);
         // Offset Pascal's (possibly non-zero) low bound to 0-based JS indexing.
         const low =
           e.array.type === 'Identifier'
-            ? this.arrayLowBounds.get(this.mapIdentifier((e.array as Identifier).name))
+            ? this.arrayLowBounds.get(this.mapIdentifier(e.array.name))
             : undefined;
         if (low !== undefined && low !== 0) return `${arr}[${idx} - ${low}]`;
         return `${arr}[${idx}]`;
       }
       default:
-        throw new Error(`Unsupported expression: ${expression.type}`);
+        return this.assertNever(expression, 'expression');
     }
   }
 
@@ -429,10 +423,10 @@ class CodeGenerator {
    */
   private isIntegerExpression(expression: Expression): boolean {
     if (expression.type === 'NumericLiteral') {
-      return Number.isInteger((expression as NumericLiteral).value);
+      return Number.isInteger(expression.value);
     }
     if (expression.type === 'BinaryExpression') {
-      const e = expression as BinaryExpression;
+      const e = expression;
       const arithmetic = new Set(['+', '-', '*', 'div', 'mod']);
       if (arithmetic.has(e.operator.toLowerCase())) {
         return this.isIntegerExpression(e.left) && this.isIntegerExpression(e.right);
@@ -440,7 +434,7 @@ class CodeGenerator {
       return false;
     }
     if (expression.type === 'UnaryExpression') {
-      const e = expression as UnaryExpression;
+      const e = expression;
       const op = e.operator.toLowerCase();
       if (op === '-' || op === '+') return this.isIntegerExpression(e.argument);
       return false;

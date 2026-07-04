@@ -75,24 +75,23 @@ export interface Block extends ASTNode {
 }
 
 /**
- * Represents a statement in Pascal
+ * Any Pascal statement. Discriminated union over `type`, so a `switch (stmt.type)`
+ * narrows to the concrete node in each branch with no cast.
  */
-export interface Statement extends ASTNode {
-  type:
-    | 'AssignmentStatement'
-    | 'IfStatement'
-    | 'WhileStatement'
-    | 'ForStatement'
-    | 'RepeatStatement'
-    | 'CaseStatement'
-    | 'CallStatement'
-    | 'CompoundStatement';
-}
+export type Statement =
+  | AssignmentStatement
+  | IfStatement
+  | WhileStatement
+  | ForStatement
+  | RepeatStatement
+  | CaseStatement
+  | CallStatement
+  | CompoundStatement;
 
 /**
  * Represents an assignment statement
  */
-export interface AssignmentStatement extends Statement {
+export interface AssignmentStatement extends ASTNode {
   type: 'AssignmentStatement';
   left: Identifier | IndexExpression;
   right: Expression;
@@ -101,7 +100,7 @@ export interface AssignmentStatement extends Statement {
 /**
  * Represents an if statement
  */
-export interface IfStatement extends Statement {
+export interface IfStatement extends ASTNode {
   type: 'IfStatement';
   condition: Expression;
   thenBranch: Statement;
@@ -111,7 +110,7 @@ export interface IfStatement extends Statement {
 /**
  * Represents a while statement
  */
-export interface WhileStatement extends Statement {
+export interface WhileStatement extends ASTNode {
   type: 'WhileStatement';
   condition: Expression;
   body: Statement;
@@ -120,7 +119,7 @@ export interface WhileStatement extends Statement {
 /**
  * Represents a for statement
  */
-export interface ForStatement extends Statement {
+export interface ForStatement extends ASTNode {
   type: 'ForStatement';
   variable: Identifier;
   start: Expression;
@@ -132,7 +131,7 @@ export interface ForStatement extends Statement {
 /**
  * Represents a repeat..until statement (post-condition loop)
  */
-export interface RepeatStatement extends Statement {
+export interface RepeatStatement extends ASTNode {
   type: 'RepeatStatement';
   body: Statement[];
   condition: Expression;
@@ -149,7 +148,7 @@ export interface CaseClause {
 /**
  * Represents a case..of statement (multi-way branch)
  */
-export interface CaseStatement extends Statement {
+export interface CaseStatement extends ASTNode {
   type: 'CaseStatement';
   expression: Expression;
   clauses: CaseClause[];
@@ -159,7 +158,7 @@ export interface CaseStatement extends Statement {
 /**
  * Represents a procedure/function call
  */
-export interface CallStatement extends Statement {
+export interface CallStatement extends ASTNode {
   type: 'CallStatement';
   name: string;
   arguments: Expression[];
@@ -168,30 +167,29 @@ export interface CallStatement extends Statement {
 /**
  * Represents a compound statement (multiple statements)
  */
-export interface CompoundStatement extends Statement {
+export interface CompoundStatement extends ASTNode {
   type: 'CompoundStatement';
   statements: Statement[];
 }
 
 /**
- * Represents an expression in Pascal
+ * Any Pascal expression. Discriminated union over `type`, so a `switch (expr.type)`
+ * narrows to the concrete node in each branch with no cast.
  */
-export interface Expression extends ASTNode {
-  type:
-    | 'BinaryExpression'
-    | 'UnaryExpression'
-    | 'Identifier'
-    | 'NumericLiteral'
-    | 'StringLiteral'
-    | 'BooleanLiteral'
-    | 'CallExpression'
-    | 'IndexExpression';
-}
+export type Expression =
+  | BinaryExpression
+  | UnaryExpression
+  | Identifier
+  | NumericLiteral
+  | StringLiteral
+  | BooleanLiteral
+  | CallExpression
+  | IndexExpression;
 
 /**
  * Represents a binary expression
  */
-export interface BinaryExpression extends Expression {
+export interface BinaryExpression extends ASTNode {
   type: 'BinaryExpression';
   operator: string;
   left: Expression;
@@ -201,7 +199,7 @@ export interface BinaryExpression extends Expression {
 /**
  * Represents a unary expression
  */
-export interface UnaryExpression extends Expression {
+export interface UnaryExpression extends ASTNode {
   type: 'UnaryExpression';
   operator: string;
   argument: Expression;
@@ -210,7 +208,7 @@ export interface UnaryExpression extends Expression {
 /**
  * Represents an identifier
  */
-export interface Identifier extends Expression {
+export interface Identifier extends ASTNode {
   type: 'Identifier';
   name: string;
 }
@@ -218,7 +216,7 @@ export interface Identifier extends Expression {
 /**
  * Represents a numeric literal
  */
-export interface NumericLiteral extends Expression {
+export interface NumericLiteral extends ASTNode {
   type: 'NumericLiteral';
   value: number;
 }
@@ -226,7 +224,7 @@ export interface NumericLiteral extends Expression {
 /**
  * Represents a string literal
  */
-export interface StringLiteral extends Expression {
+export interface StringLiteral extends ASTNode {
   type: 'StringLiteral';
   value: string;
 }
@@ -234,7 +232,7 @@ export interface StringLiteral extends Expression {
 /**
  * Represents a boolean literal
  */
-export interface BooleanLiteral extends Expression {
+export interface BooleanLiteral extends ASTNode {
   type: 'BooleanLiteral';
   value: boolean;
 }
@@ -242,7 +240,7 @@ export interface BooleanLiteral extends Expression {
 /**
  * Represents a function call expression
  */
-export interface CallExpression extends Expression {
+export interface CallExpression extends ASTNode {
   type: 'CallExpression';
   callee: string;
   arguments: Expression[];
@@ -251,7 +249,7 @@ export interface CallExpression extends Expression {
 /**
  * Represents an array index access, e.g. a[i]
  */
-export interface IndexExpression extends Expression {
+export interface IndexExpression extends ASTNode {
   type: 'IndexExpression';
   array: Expression;
   index: Expression;
