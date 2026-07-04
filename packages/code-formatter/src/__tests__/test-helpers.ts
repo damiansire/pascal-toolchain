@@ -7,11 +7,11 @@ import {
   KEYWORD_INTEGER,
   KEYWORD_BEGIN,
 } from '../shared/elements';
-import { LineType, StructuralType, FormattedPascalLine } from '../shared/types';
+import { LineType, StructuralType, FormattedPascalLine, FormatterToken } from '../shared/types';
 import { PascalToken, TokenType } from 'pascal-tokenizer';
 
 const createFormattedLine = (
-  tokens: PascalToken[],
+  tokens: FormatterToken[],
   indentation: number,
   type: LineType,
   structuralType: StructuralType,
@@ -89,7 +89,7 @@ const createWritelnLine = (
   );
 
 const createIfStatementLine = (
-  conditions: PascalToken[],
+  conditions: FormatterToken[],
   options: { indent: number; comment?: string; structuralType?: StructuralType } = { indent: 1 },
 ): FormattedPascalLine =>
   createFormattedLine(

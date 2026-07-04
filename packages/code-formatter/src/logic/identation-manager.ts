@@ -1,6 +1,7 @@
 import { CounterweightStack, CounterweightRule } from 'counterweight-stack';
 import { deepEqual } from 'objects-deep-compare';
 import { PascalToken } from 'pascal-tokenizer';
+import { FormatterToken } from '../shared/types';
 
 const beginToken: PascalToken = { type: 'KEYWORD', value: 'begin' };
 const endToken: PascalToken = { type: 'KEYWORD', value: 'end' };
@@ -30,8 +31,10 @@ class IdentationManager {
   constructor() {
     this.indentationStack = new CounterweightStack<PascalToken>(rules);
   }
-  evaluateLineIndentation(tokens: PascalToken[]) {
-    const canonical = tokens.map(canonicalize);
+  evaluateLineIndentation(tokens: FormatterToken[]) {
+    // Indentation is driven only by real keywords; drop the synthetic whitespace markers.
+    const real = tokens.filter((t): t is PascalToken => t.type !== 'WHITESPACE');
+    const canonical = real.map(canonicalize);
     let currentIndent = this.indentationStack.size();
     for (const token of canonical) {
       const result = this.indentationStack.pop(token);

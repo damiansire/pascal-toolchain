@@ -1,11 +1,11 @@
 import { PascalToken } from 'pascal-tokenizer';
-import { InternalFormattedPascalLine } from '../shared/types';
+import { FormatterToken, InternalFormattedPascalLine } from '../shared/types';
 import { WhiteSpace } from '../shared/elements';
 import { IdentationManager } from './identation-manager';
 import { isEndOfLine, needWhiteSpace } from '../shared/libs';
 
 class FormatterController {
-  private currentLineTokens: PascalToken[];
+  private currentLineTokens: FormatterToken[];
   private formattedLines: InternalFormattedPascalLine[];
   private indentationManager: IdentationManager;
 

@@ -1,7 +1,7 @@
 import { PascalToken } from 'pascal-tokenizer';
-import { FormattedPascalLine, StructuralType } from './types';
+import { FormattedPascalLine, FormatterToken, StructuralType } from './types';
 
-export const WhiteSpace: PascalToken = { type: 'WHITESPACE', value: ' ' };
+export const WhiteSpace: FormatterToken = { type: 'WHITESPACE', value: ' ' };
 
 export const VAR: PascalToken = { type: 'KEYWORD', value: 'var' };
 

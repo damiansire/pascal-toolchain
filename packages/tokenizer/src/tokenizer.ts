@@ -36,8 +36,7 @@ export type TokenType =
   // Others
   | 'KEYWORD'
   | 'IDENTIFIER'
-  | 'EOF'
-  | 'WHITESPACE';
+  | 'EOF';
 
 export interface PascalToken {
   type: TokenType;

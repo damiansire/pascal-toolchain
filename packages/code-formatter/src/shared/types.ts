@@ -1,5 +1,13 @@
 import { PascalToken } from 'pascal-tokenizer';
 
+/**
+ * A token in formatter output. The formatter injects a synthetic whitespace
+ * marker that the tokenizer never emits, so it is modeled here as a superset of
+ * PascalToken instead of leaking a 'WHITESPACE' member into the tokenizer's
+ * public TokenType (a boundary the formatter must not shape).
+ */
+export type FormatterToken = PascalToken | { type: 'WHITESPACE'; value: string };
+
 export type LineType =
   | 'ASSIGNMENT'
   | 'PROGRAM_NAME_DECLARATION'
@@ -36,14 +44,14 @@ export type StructuralType =
   | 'UNKNOWN';
 
 export interface FormattedPascalLine {
-  tokens: PascalToken[];
+  tokens: FormatterToken[];
   indentation: number;
   type: LineType;
   structuralType: StructuralType;
 }
 
 export interface InternalFormattedPascalLine {
-  tokens: PascalToken[];
+  tokens: FormatterToken[];
   indentation: number;
 }
 

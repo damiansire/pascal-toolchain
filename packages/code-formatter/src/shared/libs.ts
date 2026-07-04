@@ -1,5 +1,5 @@
 import { PascalToken } from 'pascal-tokenizer';
-import { FormattedPascalLine, LineType, StructuralType } from './types';
+import { FormattedPascalLine, FormatterToken, LineType, StructuralType } from './types';
 import { CounterweightStack } from 'counterweight-stack';
 
 const isComment = (token: PascalToken): boolean => {
@@ -125,7 +125,7 @@ const getStructuralType = (
   return typeStack.peek() || 'CODE_EXECUTION';
 };
 
-const getLineType = (tokens: PascalToken[]): LineType => {
+const getLineType = (tokens: FormatterToken[]): LineType => {
   const has = (value: string) => tokens.some((token) => token.value.toLowerCase() === value);
   if (has('program')) {
     return 'PROGRAM_NAME_DECLARATION';
