@@ -18,10 +18,6 @@ import {
   BinaryExpression,
   UnaryExpression,
   Identifier,
-  NumericLiteral,
-  StringLiteral,
-  BooleanLiteral,
-  CallExpression,
   IndexExpression,
   SourceLocation,
 } from './types';
@@ -639,7 +635,7 @@ class Parser {
         type: 'NumericLiteral',
         value: parseInt(token.value, 10),
         location: this.location(),
-      } as NumericLiteral;
+      };
     }
     if (token.type === 'NUMBER_REAL') {
       this.advance();
@@ -647,7 +643,7 @@ class Parser {
         type: 'NumericLiteral',
         value: parseFloat(token.value),
         location: this.location(),
-      } as NumericLiteral;
+      };
     }
     if (token.type === 'STRING_LITERAL') {
       this.advance();
@@ -655,7 +651,7 @@ class Parser {
         type: 'StringLiteral',
         value: token.value,
         location: this.location(),
-      } as StringLiteral;
+      };
     }
     if (token.type === 'BOOLEAN_LITERAL') {
       this.advance();
@@ -663,7 +659,7 @@ class Parser {
         type: 'BooleanLiteral',
         value: token.value.toLowerCase() === 'true',
         location: this.location(),
-      } as BooleanLiteral;
+      };
     }
     if (token.type === 'DELIMITER_LPAREN') {
       this.advance();
@@ -680,13 +676,13 @@ class Parser {
           callee: token.value,
           arguments: args,
           location: this.location(),
-        } as CallExpression;
+        };
       }
       let expr: Expression = {
         type: 'Identifier',
         name: token.value,
         location: this.location(),
-      } as Identifier;
+      };
       // Array indexing: a[i], a[i][j], ...
       while (this.check('DELIMITER_LBRACKET')) {
         this.advance();
@@ -697,7 +693,7 @@ class Parser {
           array: expr,
           index,
           location: this.location(),
-        } as IndexExpression;
+        };
       }
       return expr;
     }
