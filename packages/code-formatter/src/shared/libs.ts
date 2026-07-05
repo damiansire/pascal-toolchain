@@ -155,9 +155,8 @@ const getLineType = (tokens: FormatterToken[]): LineType => {
   if (has('program')) {
     return 'PROGRAM_NAME_DECLARATION';
   }
-  if (has(':=')) {
-    return 'ASSIGNMENT';
-  }
+  // Control-flow keywords are checked before ':=' so a one-line statement like
+  // `if x then y := 1` classifies as the control statement, not as an ASSIGNMENT.
   if (has('if')) {
     return 'IF_STATEMENT';
   }
@@ -169,6 +168,9 @@ const getLineType = (tokens: FormatterToken[]): LineType => {
   }
   if (has('for')) {
     return 'FOR_STATEMENT';
+  }
+  if (has(':=')) {
+    return 'ASSIGNMENT';
   }
   if (has('var')) {
     return 'VAR_DECLARATION';

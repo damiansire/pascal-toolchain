@@ -305,4 +305,10 @@ describe('formatPascalCode output re-parses (round-trip)', () => {
     // No glued word tokens (the bug this guards): `fori`, `1to`, `to5`, `5do`, `dowriteln`.
     expect(text).not.toMatch(/fori|1to|to5|5do|dowriteln/);
   });
+
+  it('classifies a one-line `if ... then ... :=` as IF_STATEMENT, not ASSIGNMENT', () => {
+    const lines = formatPascalCode('program p; var x: integer; begin if x > 0 then x := 1; end.');
+    const ifLine = lines.find((l) => l.tokens.some((t) => t.value.toLowerCase() === 'if'));
+    expect(ifLine?.type).toBe('IF_STATEMENT');
+  });
 });
