@@ -19,12 +19,18 @@ const rules: CounterweightRule<PascalToken>[] = [
 ];
 
 /**
- * Pascal is case-insensitive, but the tokenizer preserves the source casing, so a
- * `VAR`/`Begin`/`END` token would never deep-equal the lower-case rule constants.
- * Canonicalize keyword values to lower-case before any comparison or stack op.
+ * Reduces a token to the structural identity the rules match on: `{ type, value }`,
+ * with keyword values lower-cased. Two things make this necessary before any
+ * `deepEqual`/stack op: (1) Pascal is case-insensitive but the tokenizer preserves
+ * source casing, so `VAR`/`Begin`/`END` must be folded to match the lower-case rule
+ * constants; (2) tokens now carry `line/column/offset`, which the position-less rule
+ * constants (`beginToken`, …) do not — deep-equating the whole token would never
+ * match. Stripping to `{ type, value }` compares by identity, not by incidental position.
  */
-const canonicalize = (token: PascalToken): PascalToken =>
-  token.type === 'KEYWORD' ? { ...token, value: token.value.toLowerCase() } : token;
+const canonicalize = (token: PascalToken): PascalToken => ({
+  type: token.type,
+  value: token.type === 'KEYWORD' ? token.value.toLowerCase() : token.value,
+});
 
 /**
  * Tracks Pascal nesting depth across the lines of a program. It is intentionally

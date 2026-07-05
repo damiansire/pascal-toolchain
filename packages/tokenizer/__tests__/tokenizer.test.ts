@@ -14,7 +14,7 @@ describe('tokenizePascal', () => {
       { type: 'DELIMITER_DOT', value: '.' },
       { type: 'EOF', value: '' },
     ];
-    expect(tokenizePascal(code)).toEqual(expectedTokens);
+    expect(tokenizePascal(code)).toMatchObject(expectedTokens);
   });
 
   // Test con números
@@ -28,7 +28,7 @@ describe('tokenizePascal', () => {
       { type: 'NUMBER_REAL', value: '99.5' },
       { type: 'EOF', value: '' },
     ];
-    expect(numberTokens).toEqual(expectedNumberTokens);
+    expect(numberTokens).toMatchObject(expectedNumberTokens);
   });
 
   /*
@@ -38,7 +38,7 @@ describe('tokenizePascal', () => {
     const code = "writeln('Hello, World!');";
     const tokens = tokenizePascal(code);
     const stringToken = tokens.find((t) => t.type === 'STRING_LITERAL');
-    expect(stringToken).toEqual({ type: 'STRING_LITERAL', value: 'Hello, World!' });
+    expect(stringToken).toMatchObject({ type: 'STRING_LITERAL', value: 'Hello, World!' });
   });
 
   // Test con booleanos
@@ -46,7 +46,7 @@ describe('tokenizePascal', () => {
     const code = 'isValid := TRUE; isReady := false;';
     const tokens = tokenizePascal(code);
     const booleanTokens = tokens.filter((t) => t.type === 'BOOLEAN_LITERAL');
-    expect(booleanTokens).toEqual([
+    expect(booleanTokens).toMatchObject([
       { type: 'BOOLEAN_LITERAL', value: 'TRUE' }, // Mantiene la capitalización original
       { type: 'BOOLEAN_LITERAL', value: 'false' },
     ]);
@@ -59,7 +59,7 @@ describe('tokenizePascal', () => {
     const operatorTokens = tokens.filter(
       (t) => t.type.startsWith('OPERATOR_') || t.type.startsWith('DELIMITER_'),
     );
-    expect(operatorTokens).toEqual([
+    expect(operatorTokens).toMatchObject([
       { type: 'OPERATOR_ASSIGN', value: ':=' },
       { type: 'OPERATOR_PLUS', value: '+' },
       { type: 'OPERATOR_MULTIPLY', value: '*' },
@@ -90,7 +90,7 @@ describe('tokenizePascal', () => {
   it('should include comments when skipComments is false', () => {
     const code = '{Comment1} (*Comment2*) //Comment3';
     const tokens = tokenizePascal(code, false); // skipComments = false
-    expect(tokens).toEqual([
+    expect(tokens).toMatchObject([
       { type: 'COMMENT_BLOCK_BRACE', value: '{Comment1}' },
       { type: 'COMMENT_STAR', value: '(*Comment2*)' },
       { type: 'COMMENT_LINE', value: '//Comment3' },
@@ -101,13 +101,13 @@ describe('tokenizePascal', () => {
   // Test para entrada vacía
   it('should return only EOF for empty input', () => {
     const code = '';
-    expect(tokenizePascal(code)).toEqual([{ type: 'EOF', value: '' }]);
+    expect(tokenizePascal(code)).toMatchObject([{ type: 'EOF', value: '' }]);
   });
 
   // Test para entrada con solo espacios/saltos de línea
   it('should return only EOF for whitespace-only input', () => {
     const code = '   \n\t  \r\n ';
-    expect(tokenizePascal(code)).toEqual([{ type: 'EOF', value: '' }]);
+    expect(tokenizePascal(code)).toMatchObject([{ type: 'EOF', value: '' }]);
   });
 
   // Operadores compuestos y de rango
@@ -115,7 +115,7 @@ describe('tokenizePascal', () => {
     const code = 'a <= b >= c <> d .. e';
     const tokens = tokenizePascal(code);
     const compoundTokens = tokens.filter((t) => t.type.startsWith('OPERATOR_'));
-    expect(compoundTokens).toEqual([
+    expect(compoundTokens).toMatchObject([
       { type: 'OPERATOR_LESS_EQUAL', value: '<=' },
       { type: 'OPERATOR_GREATER_EQUAL', value: '>=' },
       { type: 'OPERATOR_NOT_EQUAL', value: '<>' },
@@ -129,7 +129,7 @@ describe('tokenizePascal', () => {
     const ptrTokens = tokens.filter(
       (t) => t.type === 'OPERATOR_POINTER' || t.type === 'OPERATOR_ADDRESSOF',
     );
-    expect(ptrTokens).toEqual([
+    expect(ptrTokens).toMatchObject([
       { type: 'OPERATOR_POINTER', value: '^' },
       { type: 'OPERATOR_ADDRESSOF', value: '@' },
     ]);
@@ -141,7 +141,7 @@ describe('tokenizePascal', () => {
     const numericAndRange = tokens.filter(
       (t) => t.type.startsWith('NUMBER_') || t.type === 'OPERATOR_RANGE',
     );
-    expect(numericAndRange).toEqual([
+    expect(numericAndRange).toMatchObject([
       { type: 'NUMBER_REAL', value: '.5' },
       { type: 'NUMBER_INTEGER', value: '1' },
       { type: 'OPERATOR_RANGE', value: '..' },
@@ -153,7 +153,7 @@ describe('tokenizePascal', () => {
     // ISO Pascal: '5.' is the integer 5 followed by '.', not the real 5.0.
     const tokens = tokenizePascal('5.');
     const relevant = tokens.filter((t) => t.type !== 'EOF');
-    expect(relevant).toEqual([
+    expect(relevant).toMatchObject([
       { type: 'NUMBER_INTEGER', value: '5' },
       { type: 'DELIMITER_DOT', value: '.' },
     ]);
@@ -162,7 +162,7 @@ describe('tokenizePascal', () => {
   it("should tokenize an integer immediately followed by a range operator ('5..10')", () => {
     const tokens = tokenizePascal('5..10');
     const relevant = tokens.filter((t) => t.type !== 'EOF');
-    expect(relevant).toEqual([
+    expect(relevant).toMatchObject([
       { type: 'NUMBER_INTEGER', value: '5' },
       { type: 'OPERATOR_RANGE', value: '..' },
       { type: 'NUMBER_INTEGER', value: '10' },
@@ -173,7 +173,7 @@ describe('tokenizePascal', () => {
   it('should handle escaped quotes inside a string literal', () => {
     const tokens = tokenizePascal("s := 'it''s ok';");
     const stringToken = tokens.find((t) => t.type === 'STRING_LITERAL');
-    expect(stringToken).toEqual({ type: 'STRING_LITERAL', value: "it's ok" });
+    expect(stringToken).toMatchObject({ type: 'STRING_LITERAL', value: "it's ok" });
   });
 
   // Rutas de error: el lexer debe fallar con línea y columna, no continuar
@@ -243,6 +243,25 @@ describe('tokenizePascal', () => {
       { type: 'EOF', value: '' },
     ];
 
-    expect(tokens).toEqual(expected);
+    expect(tokens).toMatchObject(expected);
+  });
+
+  // Positions: 1-based line/column, 0-based offset, stamped on every real token.
+  // Exercises newline tracking (tokens on lines 2 and 3) and the EOF sentinel.
+  it('stamps 1-based line/column and 0-based offset on every token', () => {
+    const code = 'program p;\nbegin\n  x := 5;\nend.';
+    expect(tokenizePascal(code)).toEqual([
+      { type: 'KEYWORD', value: 'program', line: 1, column: 1, offset: 0 },
+      { type: 'IDENTIFIER', value: 'p', line: 1, column: 9, offset: 8 },
+      { type: 'DELIMITER_SEMICOLON', value: ';', line: 1, column: 10, offset: 9 },
+      { type: 'KEYWORD', value: 'begin', line: 2, column: 1, offset: 11 },
+      { type: 'IDENTIFIER', value: 'x', line: 3, column: 3, offset: 19 },
+      { type: 'OPERATOR_ASSIGN', value: ':=', line: 3, column: 5, offset: 21 },
+      { type: 'NUMBER_INTEGER', value: '5', line: 3, column: 8, offset: 24 },
+      { type: 'DELIMITER_SEMICOLON', value: ';', line: 3, column: 9, offset: 25 },
+      { type: 'KEYWORD', value: 'end', line: 4, column: 1, offset: 27 },
+      { type: 'DELIMITER_DOT', value: '.', line: 4, column: 4, offset: 30 },
+      { type: 'EOF', value: '', line: 4, column: 5, offset: 31 },
+    ]);
   });
 });

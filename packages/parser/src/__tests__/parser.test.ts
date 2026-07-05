@@ -155,6 +155,21 @@ end.`;
         expect(() => parse(source)).toThrow(ParseError);
         expect(isValid(source)).toBe(false);
       });
+
+      it('ParseError carries the offending token position (message + location)', () => {
+        // Missing ';' after the program name: the offending token is 'begin' on line 2.
+        const source = 'program p\nbegin end.';
+        let caught: unknown;
+        try {
+          parse(source);
+        } catch (e) {
+          caught = e;
+        }
+        expect(caught).toBeInstanceOf(ParseError);
+        const err = caught as ParseError;
+        expect(err.message).toMatch(/at line 2, column 1/);
+        expect(err.location?.start).toEqual({ line: 2, column: 1, offset: 10 });
+      });
     });
 
     describe('Lexically invalid input', () => {

@@ -67,7 +67,7 @@ class Parser {
   /** Guards recursive descent against unbounded nesting (DoS). Throws ParseError. */
   private enter(): void {
     if (++this.depth > MAX_NESTING_DEPTH) {
-      throw new ParseError('Expression or statement nesting too deep');
+      throw this.parseError('Expression or statement nesting too deep');
     }
   }
 
@@ -123,20 +123,51 @@ class Parser {
 
   private consume(type: TokenType, message: string): PascalToken {
     if (this.check(type)) return this.advance();
-    throw new ParseError(message);
+    throw this.parseError(message);
   }
 
   private consumeKeyword(word: string, message: string): PascalToken {
     if (this.checkKeyword(word)) return this.advance();
-    throw new ParseError(message);
+    throw this.parseError(message);
   }
 
-  // The tokenizer doesn't track positions yet; emit a zeroed location.
+  // Builds a SourceLocation from a single token. The tokenizer now stamps a real
+  // line/column/offset on every token, so this is a genuine position (older tokens
+  // synthesised without positions fall back to 0). `end.offset` spans the token text.
+  private locationOf(token: PascalToken): SourceLocation {
+    const line = token.line ?? 0;
+    const column = token.column ?? 0;
+    const offset = token.offset ?? 0;
+    return {
+      start: { line, column, offset },
+      end: { line, column: column + token.value.length, offset: offset + token.value.length },
+    };
+  }
+
+  // AST nodes still carry a zeroed location. Tokens now expose real line/column/offset
+  // (see locationOf), but a node's true span runs first-token..last-token, which means
+  // threading a start token through every node constructor. No consumer reads node
+  // locations today (codegen ignores them; there are no source maps yet), so stamping
+  // them now would be speculative surface — the exact "promise a position nothing uses"
+  // trap. Deferred until a consumer (source maps) needs it. Error positions, which DO
+  // have a consumer, flow through parseError/locationOf instead.
   private location(): SourceLocation {
     return {
       start: { line: 0, column: 0, offset: 0 },
       end: { line: 0, column: 0, offset: 0 },
     };
+  }
+
+  // Produces a ParseError whose message carries "at line L, column C" and whose
+  // `location` points at the offending token, so a consumer catching the error can
+  // report where the input went wrong instead of getting a bare, position-less
+  // message. Defaults to the current lookahead token.
+  private parseError(message: string, token: PascalToken = this.peek()): ParseError {
+    const where =
+      token.line !== undefined && token.column !== undefined
+        ? ` at line ${token.line}, column ${token.column}`
+        : '';
+    return new ParseError(`${message}${where}`, this.locationOf(token));
   }
 
   // ---- program / declarations -------------------------------------------
@@ -307,7 +338,7 @@ class Parser {
     if (this.check('IDENTIFIER')) {
       return this.advance().value;
     }
-    throw new ParseError('Expected a type name');
+    throw this.parseError('Expected a type name');
   }
 
   // ---- statements --------------------------------------------------------
@@ -347,7 +378,7 @@ class Parser {
     if (this.checkKeyword('repeat')) return this.parseRepeat();
     if (this.checkKeyword('case')) return this.parseCase();
     if (this.check('IDENTIFIER')) return this.parseIdentifierStatement();
-    throw new ParseError(`Unexpected token in statement: '${this.peek().value}'`);
+    throw this.parseError(`Unexpected token in statement: '${this.peek().value}'`);
   }
 
   private parseCompound(): CompoundStatement {
@@ -450,7 +481,7 @@ class Parser {
       direction = 'downto';
       this.advance();
     } else {
-      throw new ParseError("Expected 'to' or 'downto' in for loop");
+      throw this.parseError("Expected 'to' or 'downto' in for loop");
     }
     const end = this.parseExpression();
     this.consumeKeyword('do', "Expected 'do'");
@@ -673,7 +704,7 @@ class Parser {
       return expr;
     }
 
-    throw new ParseError(`Unexpected token in expression: '${token.value}'`);
+    throw this.parseError(`Unexpected token in expression: '${token.value}'`, token);
   }
 
   parse(): Program {

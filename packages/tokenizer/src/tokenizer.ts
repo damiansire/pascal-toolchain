@@ -41,6 +41,12 @@ export type TokenType =
 export interface PascalToken {
   type: TokenType;
   value: string;
+  /** 1-based line where the token starts. Absent on synthetic tokens (e.g. the formatter's). */
+  line?: number;
+  /** 1-based column where the token starts. */
+  column?: number;
+  /** 0-based character offset of the token start in the source. */
+  offset?: number;
 }
 
 /**
@@ -71,6 +77,35 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     const line = upTo.split('\n').length;
     const column = index - upTo.lastIndexOf('\n');
     throw new TokenizeError(`${message} at line ${line}, column ${column}`, line, column);
+  };
+
+  // Forward-only cursor that turns a start offset into a 1-based line/column.
+  // Tokens are emitted in non-decreasing start-offset order, so this walks each
+  // source character at most once across the whole pass (amortized O(n)); the
+  // naive `code.slice(0, offset).split('\n')` per token would be O(n^2) on the
+  // hottest loop of the toolchain (see the char-scan perf notes above `fail`).
+  let posIndex = 0;
+  let posLine = 1;
+  let posColumn = 1;
+  const positionAt = (offset: number): Pick<PascalToken, 'line' | 'column' | 'offset'> => {
+    while (posIndex < offset) {
+      if (code.charAt(posIndex) === '\n') {
+        posLine++;
+        posColumn = 1;
+      } else {
+        posColumn++;
+      }
+      posIndex++;
+    }
+    return { line: posLine, column: posColumn, offset };
+  };
+
+  // Start offset of the token currently being scanned; set at the top of the loop
+  // and stamped onto every emitted token via `emit`, so position tracking lives in
+  // one place instead of being threaded through 16 push sites.
+  let tokenStart = 0;
+  const emit = (type: TokenType, value: string): void => {
+    tokens.push({ type, value, ...positionAt(tokenStart) });
   };
 
   // Common Pascal keywords (case-insensitive)
@@ -142,6 +177,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     // under noUncheckedIndexedAccess without an unchecked index assertion.
     const char = code.charAt(currentIndex);
     const nextChar = code.charAt(currentIndex + 1); // Simple lookahead
+    tokenStart = currentIndex; // start offset of whatever token this iteration emits
 
     // 1. Ignore Whitespace
     if (whitespaceRegex.test(char)) {
@@ -159,10 +195,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       } else {
         if (!skipComments) {
           const comment = code.substring(currentIndex - 1, commentEnd + 1);
-          tokens.push({
-            type: 'COMMENT_BLOCK_BRACE',
-            value: comment,
-          });
+          emit('COMMENT_BLOCK_BRACE', comment);
         }
         currentIndex = commentEnd + 1;
       }
@@ -177,10 +210,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       } else {
         if (!skipComments) {
           const comment = code.substring(currentIndex - 2, commentEnd + 2);
-          tokens.push({
-            type: 'COMMENT_STAR',
-            value: comment,
-          });
+          emit('COMMENT_STAR', comment);
         }
         currentIndex = commentEnd + 2;
       }
@@ -196,37 +226,34 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       // currentIndex is now at \n or end of code
       if (!skipComments) {
         const comment = code.substring(initialIndex, currentIndex);
-        tokens.push({
-          type: 'COMMENT_LINE',
-          value: comment,
-        });
+        emit('COMMENT_LINE', comment);
       }
       continue;
     }
 
     // 3. Handle Compound Operators and Ranges (CHECK BEFORE SIMPLE ONES)
     if (char === ':' && nextChar === '=') {
-      tokens.push({ type: 'OPERATOR_ASSIGN', value: ':=' });
+      emit('OPERATOR_ASSIGN', ':=');
       currentIndex += 2;
       continue;
     }
     if (char === '<' && nextChar === '=') {
-      tokens.push({ type: 'OPERATOR_LESS_EQUAL', value: '<=' });
+      emit('OPERATOR_LESS_EQUAL', '<=');
       currentIndex += 2;
       continue;
     }
     if (char === '>' && nextChar === '=') {
-      tokens.push({ type: 'OPERATOR_GREATER_EQUAL', value: '>=' });
+      emit('OPERATOR_GREATER_EQUAL', '>=');
       currentIndex += 2;
       continue;
     }
     if (char === '<' && nextChar === '>') {
-      tokens.push({ type: 'OPERATOR_NOT_EQUAL', value: '<>' });
+      emit('OPERATOR_NOT_EQUAL', '<>');
       currentIndex += 2;
       continue;
     }
     if (char === '.' && nextChar === '.') {
-      tokens.push({ type: 'OPERATOR_RANGE', value: '..' });
+      emit('OPERATOR_RANGE', '..');
       currentIndex += 2;
       continue;
     }
@@ -257,7 +284,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       if (!closed) {
         fail('Unclosed string literal', currentIndex);
       }
-      tokens.push({ type: 'STRING_LITERAL', value: stringValue });
+      emit('STRING_LITERAL', stringValue);
       currentIndex = lookaheadIndex;
       continue;
     }
@@ -266,7 +293,10 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     if (letterRegex.test(char)) {
       let value = char;
       let lookaheadIndex = currentIndex + 1;
-      while (lookaheadIndex < code.length && identifierCharRegex.test(code.charAt(lookaheadIndex))) {
+      while (
+        lookaheadIndex < code.length &&
+        identifierCharRegex.test(code.charAt(lookaheadIndex))
+      ) {
         value += code.charAt(lookaheadIndex);
         lookaheadIndex++;
       }
@@ -276,12 +306,12 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       if (keywords.has(lowerCaseValue)) {
         // You could have specific types like 'BOOLEAN_LITERAL' if preferred
         if (lowerCaseValue === 'true' || lowerCaseValue === 'false') {
-          tokens.push({ type: 'BOOLEAN_LITERAL', value: value });
+          emit('BOOLEAN_LITERAL', value);
         } else {
-          tokens.push({ type: 'KEYWORD', value: value });
+          emit('KEYWORD', value);
         }
       } else {
-        tokens.push({ type: 'IDENTIFIER', value: value });
+        emit('IDENTIFIER', value);
       }
       continue;
     }
@@ -329,13 +359,13 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
       if (isReal) {
         // Make sure it's not just an isolated '.'
         if (value !== '.') {
-          tokens.push({ type: 'NUMBER_REAL', value: value });
+          emit('NUMBER_REAL', value);
         } else {
           // It was a simple '.', handle as delimiter below
           lookaheadIndex = currentIndex; // Reset to be detected by singleCharTokens
         }
       } else {
-        tokens.push({ type: 'NUMBER_INTEGER', value: value });
+        emit('NUMBER_INTEGER', value);
       }
 
       // Only advance if we actually consumed a number
@@ -349,7 +379,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     // 7. Handle Simple Operators/Delimiters (Last option)
     const singleType = singleCharTokens[char];
     if (singleType !== undefined) {
-      tokens.push({ type: singleType, value: char });
+      emit(singleType, char);
       currentIndex++;
       continue;
     }
@@ -358,6 +388,7 @@ export function tokenizePascal(code: string, skipComments: boolean = true) {
     fail(`Unknown character '${char}'`, currentIndex);
   }
 
-  tokens.push({ type: 'EOF', value: '' });
+  tokenStart = code.length; // the EOF sentinel sits at the end of the source
+  emit('EOF', '');
   return tokens;
 }

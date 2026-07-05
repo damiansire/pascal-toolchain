@@ -23,7 +23,7 @@ describe('Simple Cases', () => {
       createWritelnLine("'Hello, world!'"),
       createEndLine({ indent: 0, withDot: true }),
     ];
-    expect(formatPascalCode(input)).toEqual(expected);
+    expect(formatPascalCode(input)).toMatchObject(expected);
   });
 
   test('should handle escaped single quotes in strings', () => {
@@ -35,7 +35,7 @@ describe('Simple Cases', () => {
       createWritelnLine("'It''s a beautiful day'"),
       createEndLine({ indent: 0, withDot: true }),
     ];
-    expect(formatPascalCode(input)).toEqual(expected);
+    expect(formatPascalCode(input)).toMatchObject(expected);
   });
 
   test('should handle multiple writeln statements with escaped quotes', () => {
@@ -54,7 +54,7 @@ describe('Simple Cases', () => {
       createWritelnLine("'String with multiple ''quotes'' here'"),
       createEndLine({ indent: 0, withDot: true }),
     ];
-    expect(formatPascalCode(input)).toEqual(expected);
+    expect(formatPascalCode(input)).toMatchObject(expected);
   });
 
   test('should handle empty strings', () => {
@@ -66,7 +66,7 @@ describe('Simple Cases', () => {
       createWritelnLine("''"),
       createEndLine({ indent: 0, withDot: true }),
     ];
-    expect(formatPascalCode(input)).toEqual(expected);
+    expect(formatPascalCode(input)).toMatchObject(expected);
   });
 
   test('should handle strings with only escaped quotes', () => {
@@ -78,7 +78,7 @@ describe('Simple Cases', () => {
       createWritelnLine("''''"),
       createEndLine({ indent: 0, withDot: true }),
     ];
-    expect(formatPascalCode(input)).toEqual(expected);
+    expect(formatPascalCode(input)).toMatchObject(expected);
   });
 
   test('should handle strings with multiple escaped quotes', () => {
@@ -90,7 +90,7 @@ describe('Simple Cases', () => {
       createWritelnLine("''''''''"),
       createEndLine({ indent: 0, withDot: true }),
     ];
-    expect(formatPascalCode(input)).toEqual(expected);
+    expect(formatPascalCode(input)).toMatchObject(expected);
   });
 });
 
@@ -107,7 +107,7 @@ describe('formatPascalCode', () => {
       createBeginLine(),
       createEndLine({ indent: 0, withDot: true }),
     ];
-    expect(formatPascalCode(input)).toEqual(expected);
+    expect(formatPascalCode(input)).toMatchObject(expected);
   });
 
   test('indentation is case-insensitive: UPPERCASE keywords indent like lowercase ones', () => {
@@ -117,7 +117,7 @@ describe('formatPascalCode', () => {
     const lower = 'program Test; var x: integer; y: integer; begin end.';
     const upper = 'PROGRAM Test; VAR x: INTEGER; y: INTEGER; BEGIN END.';
     const indents = (code: string) => formatPascalCode(code).map((line) => line.indentation);
-    expect(indents(upper)).toEqual(indents(lower));
+    expect(indents(upper)).toMatchObject(indents(lower));
   });
 
   test('should format a simple Hello World program with comments', () => {
@@ -140,7 +140,7 @@ describe('formatPascalCode', () => {
         'CODE_EXECUTION',
       ),
     ];
-    expect(formatPascalCode(input)).toEqual(expected);
+    expect(formatPascalCode(input)).toMatchObject(expected);
   });
 
   test('should format if-then-else with comments', () => {
@@ -214,7 +214,7 @@ end.`;
       ),
       createEndLine({ indent: 0, withDot: true }),
     ];
-    expect(formatPascalCode(input)).toEqual(expected);
+    expect(formatPascalCode(input)).toMatchObject(expected);
   });
 });
 
@@ -228,7 +228,7 @@ describe('fragments degrade gracefully (no crash)', () => {
 
   test('bare `end` fragment still produces the end line', () => {
     const result = formatPascalCode('begin end');
-    expect(result).toEqual([createBeginLine(), createEndLine({ indent: 0 })]);
+    expect(result).toMatchObject([createBeginLine(), createEndLine({ indent: 0 })]);
   });
 });
 
@@ -240,7 +240,7 @@ describe('spacing is case-insensitive (needWhiteSpace normalizes keywords)', () 
     const upper = 'PROGRAM Test; BEGIN IF x THEN y := 1; END.';
     const typeShape = (code: string) =>
       formatPascalCode(code).map((line) => line.tokens?.map((t) => t.type) ?? []);
-    expect(typeShape(upper)).toEqual(typeShape(lower));
+    expect(typeShape(upper)).toMatchObject(typeShape(lower));
   });
 });
 
@@ -249,7 +249,7 @@ describe('one line test', () => {
   const result = formatPascalCode(input);
 
   test('first line is only condition', () => {
-    expect(result[0]).toEqual(
+    expect(result[0]).toMatchObject(
       createIfStatementLine(
         [
           { type: 'IDENTIFIER', value: 'temperaturaActual' },
@@ -268,6 +268,6 @@ describe('one line test', () => {
   });
 
   test('the second line is begin', () => {
-    expect(result[1]).toEqual(createBeginLine());
+    expect(result[1]).toMatchObject(createBeginLine());
   });
 });
