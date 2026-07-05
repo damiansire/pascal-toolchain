@@ -24,6 +24,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "lint:publish": "publint packages/tokenizer && publint packages/parser && publint packages/compiler && publint packages/code-formatter",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish"
@@ -34,6 +35,7 @@
     "@size-limit/preset-small-lib": "^12.1.0",
     "eslint": "^9.13.0",
     "prettier": "^3.3.0",
+    "publint": "0.3.21",
     "size-limit": "^12.1.0",
     "tsd": "^0.33.0",
     "typescript": "^5.6.3",

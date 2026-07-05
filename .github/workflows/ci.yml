@@ -38,6 +38,9 @@ jobs:
       - name: Type-tests (public API)
         run: npm run test:types
 
+      - name: Package lint (publint)
+        run: npm run lint:publish
+
   bundle-size:
     runs-on: ubuntu-latest
     steps:

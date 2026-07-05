@@ -2,6 +2,7 @@
   "name": "pascal-parser",
   "version": "0.2.1",
   "description": "A Pascal language parser library",
+  "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {

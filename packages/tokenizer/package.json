@@ -2,6 +2,7 @@
   "name": "pascal-tokenizer",
   "version": "0.0.3",
   "description": "A tokenizer for Pascal programming language",
+  "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
