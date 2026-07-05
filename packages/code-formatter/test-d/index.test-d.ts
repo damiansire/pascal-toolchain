@@ -1,11 +1,13 @@
 import { expectType, expectError, expectAssignable } from 'tsd';
 import {
   formatPascalCode,
+  formatPascalSource,
   FormattedPascalLine,
   FormatterToken,
   PascalToken,
   TokenType,
 } from 'pascal-code-formatter';
+import type { AstFormatOptions } from 'pascal-code-formatter';
 
 // formatPascalCode(code, options?) -> FormattedPascalLine[].
 const lines = formatPascalCode('program p; begin end.');
@@ -30,3 +32,12 @@ expectAssignable<FormatterToken>({ type: 'KEYWORD' as TokenType, value: 'begin' 
 expectAssignable<TokenType>('KEYWORD');
 const tok: PascalToken = { type: 'IDENTIFIER', value: 'x' };
 expectType<TokenType>(tok.type);
+
+// formatPascalSource(code, options?) -> formatted Pascal text (string).
+expectType<string>(formatPascalSource('program p; begin end.'));
+expectType<string>(formatPascalSource('program p; begin end.', { indent: '\t' }));
+const astOpts: AstFormatOptions = {};
+expectType<string | undefined>(astOpts.indent);
+expectError(formatPascalSource());
+expectError(formatPascalSource(42));
+expectError(formatPascalSource('x', { indent: 4 }));

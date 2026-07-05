@@ -17,6 +17,6 @@
   {
     "name": "pascal-code-formatter",
     "path": "packages/code-formatter/dist/index.js",
-    "limit": "6 kB"
+    "limit": "9 kB"
   }
 ]

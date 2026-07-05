@@ -34,11 +34,13 @@ source.pas → tokenizer → parser → compiler → output.js
 | `pascal-tokenizer`      | `packages/tokenizer`      | Lexer: Pascal source → token stream.                           |
 | `pascal-parser`         | `packages/parser`         | Builds the AST from tokens. Depends on `pascal-tokenizer`.     |
 | `pascal-js-compiler`    | `packages/compiler`       | Code generation: AST → JavaScript. Depends on `pascal-parser`. |
-| `pascal-code-formatter` | `packages/code-formatter` | Pretty-prints Pascal. Depends on `pascal-tokenizer`.           |
+| `pascal-code-formatter` | `packages/code-formatter` | Pretty-prints Pascal. Depends on `pascal-parser` + `pascal-tokenizer`. |
 
 **Dependency direction** (never import against it):
-`compiler → parser → tokenizer`, and `code-formatter → tokenizer`. Nothing
-depends on the compiler or the formatter.
+`compiler → parser → tokenizer`, and `code-formatter → parser → tokenizer`.
+Nothing depends on the compiler or the formatter. The formatter offers two paths:
+`formatPascalSource` consumes the parser's AST (exact, precedence-aware), while the
+older `formatPascalCode` works off the token stream directly.
 
 ## Where tests go
 
