@@ -29,11 +29,11 @@ source.pas → tokenizer → parser → compiler → output.js
                             └────→ code-formatter → pretty Pascal
 ```
 
-| Package (npm name)      | Path                      | Role                                                           |
-| ----------------------- | ------------------------- | -------------------------------------------------------------- |
-| `pascal-tokenizer`      | `packages/tokenizer`      | Lexer: Pascal source → token stream.                           |
-| `pascal-parser`         | `packages/parser`         | Builds the AST from tokens. Depends on `pascal-tokenizer`.     |
-| `pascal-js-compiler`    | `packages/compiler`       | Code generation: AST → JavaScript. Depends on `pascal-parser`. |
+| Package (npm name)      | Path                      | Role                                                                   |
+| ----------------------- | ------------------------- | ---------------------------------------------------------------------- |
+| `pascal-tokenizer`      | `packages/tokenizer`      | Lexer: Pascal source → token stream.                                   |
+| `pascal-parser`         | `packages/parser`         | Builds the AST from tokens. Depends on `pascal-tokenizer`.             |
+| `pascal-js-compiler`    | `packages/compiler`       | Code generation: AST → JavaScript. Depends on `pascal-parser`.         |
 | `pascal-code-formatter` | `packages/code-formatter` | Pretty-prints Pascal. Depends on `pascal-parser` + `pascal-tokenizer`. |
 
 **Dependency direction** (never import against it):
