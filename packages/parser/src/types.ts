@@ -34,25 +34,48 @@ export interface Program extends ASTNode {
 }
 
 /**
- * Represents a declaration in Pascal
+ * Any Pascal declaration. Discriminated union over `type`, so a `switch (decl.type)`
+ * narrows to the concrete node in each branch with no cast — matching Statement and
+ * Expression. Each variant carries exactly the fields it needs (a `var` has a
+ * `varType`, a `function` a `returnType`, …) instead of one wide interface where
+ * every field is optional and any combination is representable.
  */
-export interface Declaration extends ASTNode {
-  type:
-    | 'VariableDeclaration'
-    | 'FunctionDeclaration'
-    | 'ProcedureDeclaration'
-    | 'ConstantDeclaration';
+export type Declaration =
+  | VariableDeclaration
+  | FunctionDeclaration
+  | ProcedureDeclaration
+  | ConstantDeclaration;
+
+/** A `var` declaration: `name: varType`, optionally `array[low..high] of varType`. */
+export interface VariableDeclaration extends ASTNode {
+  type: 'VariableDeclaration';
   name: string;
-  // For variable declarations
-  varType?: string;
-  // For function/procedure declarations
-  parameters?: Parameter[];
-  returnType?: string;
-  body?: Block;
-  // For constant declarations
-  value?: Expression;
-  // For array variable declarations: array[low..high] of <varType>
+  varType: string;
   arrayBounds?: { low: number; high: number };
+}
+
+/** A `function` declaration: parameters plus a return type and a body. */
+export interface FunctionDeclaration extends ASTNode {
+  type: 'FunctionDeclaration';
+  name: string;
+  parameters: Parameter[];
+  returnType: string;
+  body: Block;
+}
+
+/** A `procedure` declaration: like a function but with no return type. */
+export interface ProcedureDeclaration extends ASTNode {
+  type: 'ProcedureDeclaration';
+  name: string;
+  parameters: Parameter[];
+  body: Block;
+}
+
+/** A `const` declaration bound to a constant expression. */
+export interface ConstantDeclaration extends ASTNode {
+  type: 'ConstantDeclaration';
+  name: string;
+  value: Expression;
 }
 
 /**

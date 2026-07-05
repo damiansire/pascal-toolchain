@@ -289,15 +289,13 @@ class Parser {
     this.consume('DELIMITER_SEMICOLON', "Expected ';' after subprogram header");
     const body = this.parseBlock();
     this.consume('DELIMITER_SEMICOLON', "Expected ';' after subprogram body");
-    return {
-      type: isFunction ? 'FunctionDeclaration' : 'ProcedureDeclaration',
-      name: nameToken.value,
-      parameters,
-      // omit for procedures (exactOptionalPropertyTypes): only functions return
-      ...(returnType !== undefined && { returnType }),
-      body,
-      location: this.location(),
-    };
+    const name = nameToken.value;
+    const location = this.location();
+    // A function has a return type, a procedure does not — build the concrete node so
+    // the discriminated union stays honest (no field a procedure shouldn't have).
+    return returnType !== undefined
+      ? { type: 'FunctionDeclaration', name, parameters, returnType, body, location }
+      : { type: 'ProcedureDeclaration', name, parameters, body, location };
   }
 
   private parseParameterList(): Parameter[] {

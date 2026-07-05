@@ -12,6 +12,8 @@ import {
   parse,
   Program,
   Declaration,
+  FunctionDeclaration,
+  ProcedureDeclaration,
   Block,
   Statement,
   CallStatement,
@@ -75,7 +77,7 @@ class CodeGenerator {
         declaration.type === 'ProcedureDeclaration'
       ) {
         this.userSubprograms.add(declaration.name.toLowerCase());
-        if (declaration.body?.declarations) {
+        if (declaration.body.declarations) {
           this.collectSubprograms(declaration.body.declarations);
         }
       }
@@ -114,17 +116,16 @@ class CodeGenerator {
             `${pad}let ${name} = new Array(${size}).fill(0); // array[${low}..${high}] of ${declaration.varType}`,
           ];
         }
-        const typeComment = declaration.varType ? ` // ${declaration.varType}` : '';
-        return [`${pad}let ${name};${typeComment}`];
+        return [`${pad}let ${name}; // ${declaration.varType}`];
       }
       case 'ConstantDeclaration': {
-        const value = declaration.value ? this.genExpression(declaration.value) : 'undefined';
+        const value = this.genExpression(declaration.value);
         return [`${pad}const ${this.mapIdentifier(declaration.name)} = ${value};`];
       }
       case 'ProcedureDeclaration': {
         const params = this.genParameters(declaration);
         const lines = [`${pad}function ${this.mapIdentifier(declaration.name)}(${params}) {`];
-        if (declaration.body) lines.push(...this.genBlock(declaration.body, level + 1));
+        lines.push(...this.genBlock(declaration.body, level + 1));
         lines.push(`${pad}}`);
         return lines;
       }
@@ -135,14 +136,16 @@ class CodeGenerator {
         lines.push(`${this.pad(level + 1)}let $result;`);
         const previous = this.currentFunction;
         this.currentFunction = declaration.name.toLowerCase();
-        if (declaration.body) lines.push(...this.genBlock(declaration.body, level + 1));
+        lines.push(...this.genBlock(declaration.body, level + 1));
         this.currentFunction = previous;
         lines.push(`${this.pad(level + 1)}return $result;`);
         lines.push(`${pad}}`);
         return lines;
       }
       default:
-        throw new Error(`Unsupported declaration: ${declaration.type}`);
+        // Declaration is a discriminated union, so `declaration` is `never` here: an
+        // unhandled variant becomes a build error instead of a silent runtime drop.
+        return this.assertNever(declaration, 'declaration');
     }
   }
 
@@ -152,8 +155,8 @@ class CodeGenerator {
    * would silently fail to propagate to the caller. Reject them loudly instead
    * of emitting code that quietly computes the wrong result.
    */
-  private genParameters(declaration: Declaration): string {
-    const parameters = declaration.parameters ?? [];
+  private genParameters(declaration: FunctionDeclaration | ProcedureDeclaration): string {
+    const parameters = declaration.parameters;
     const byRef = parameters.find((p) => p.isVar);
     if (byRef) {
       throw new Error(
