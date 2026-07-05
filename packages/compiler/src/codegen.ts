@@ -117,6 +117,21 @@ class CodeGenerator {
     return this.indentUnit.repeat(level);
   }
 
+  // Runs `fn` with array low-bound info scoped to a nested block: the child inherits a
+  // snapshot of the outer bounds (a Pascal nested scope can see outer arrays) but its
+  // own array declarations do not leak back out. Without this, a homonym array in one
+  // subprogram would overwrite — and corrupt the 1-based index offset of — a same-named
+  // array in a sibling or outer scope.
+  private withArrayScope<T>(fn: () => T): T {
+    const saved = this.arrayLowBounds;
+    this.arrayLowBounds = new Map(saved);
+    try {
+      return fn();
+    } finally {
+      this.arrayLowBounds = saved;
+    }
+  }
+
   private genDeclaration(declaration: Declaration, level: number): string[] {
     const pad = this.pad(level);
     switch (declaration.type) {
@@ -139,7 +154,7 @@ class CodeGenerator {
       case 'ProcedureDeclaration': {
         const params = this.genParameters(declaration);
         const lines = [`${pad}function ${this.mapIdentifier(declaration.name)}(${params}) {`];
-        lines.push(...this.genBlock(declaration.body, level + 1));
+        lines.push(...this.withArrayScope(() => this.genBlock(declaration.body, level + 1)));
         lines.push(`${pad}}`);
         return lines;
       }
@@ -150,7 +165,7 @@ class CodeGenerator {
         lines.push(`${this.pad(level + 1)}let $result;`);
         const previous = this.currentFunction;
         this.currentFunction = declaration.name.toLowerCase();
-        lines.push(...this.genBlock(declaration.body, level + 1));
+        lines.push(...this.withArrayScope(() => this.genBlock(declaration.body, level + 1)));
         this.currentFunction = previous;
         lines.push(`${this.pad(level + 1)}return $result;`);
         lines.push(`${pad}}`);

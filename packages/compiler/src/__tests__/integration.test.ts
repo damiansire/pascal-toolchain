@@ -276,4 +276,24 @@ end.`);
     }
     expect(chunks.join('')).toBe('x42true');
   });
+
+  it('a homonym array in a subprogram does not corrupt an outer array of the same name', () => {
+    // Regression: array low-bounds were tracked in a single flat map keyed by name, so
+    // the local `a` (low 1) overwrote the global `a` (low 5) and the global index offset
+    // came out wrong. The global write/read must use its own low bound (5) → index 0.
+    const output = run(`program H;
+var
+  a: array[5..7] of integer;
+procedure fill;
+var
+  a: array[1..3] of integer;
+begin
+  a[1] := 99;
+end;
+begin
+  a[5] := 42;
+  writeln(a[5]);
+end.`);
+    expect(output).toEqual([42]);
+  });
 });
