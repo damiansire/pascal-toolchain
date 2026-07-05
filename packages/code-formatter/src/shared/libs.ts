@@ -126,7 +126,12 @@ const getStructuralType = (
 };
 
 const getLineType = (tokens: FormatterToken[]): LineType => {
-  const has = (value: string) => tokens.some((token) => token.value.toLowerCase() === value);
+  // Lower-case each token value ONCE into a lookup set, instead of re-scanning the
+  // whole line and re-lowering every token for each of the 14 keyword probes below
+  // (O(14 x tokens) with as many throwaway toLowerCase allocations). This is also
+  // the single place the line's keyword casing is normalized.
+  const values = new Set(tokens.map((token) => token.value.toLowerCase()));
+  const has = (value: string) => values.has(value);
   if (has('program')) {
     return 'PROGRAM_NAME_DECLARATION';
   }
