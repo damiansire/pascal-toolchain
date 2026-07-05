@@ -12,13 +12,18 @@ procedural subset (see README); these extend it.
 - [ ] **Multi-dimensional arrays** — `array[1..3, 1..3]`.
 - [ ] **Records** — `record ... end`, field access.
 - [ ] **Sets** — `set of`, `in` operator.
-- [ ] **More builtins** — `read`/`readln`, `length`, `inc`/`dec`, string helpers.
-- [ ] **Real source locations** — the tokenizer currently emits zeroed positions;
-      track line/column to produce meaningful parse-error messages.
+- [ ] **More builtins** — `read`/`readln`, `length`, string helpers. (`inc`/`dec` and
+      `abs`/`sqrt`/`sqr`/`trunc`/`round`/`odd` already ship.)
+- [x] **Real source locations (tokens)** — the tokenizer stamps 1-based line/column and
+      0-based offset on every token, and `ParseError` reports `at line L, column C` with a
+      `location` (pending release via Changesets).
+- [ ] **AST node source locations** — nodes still carry a zeroed `location`; propagate the
+      token positions into them once a consumer (e.g. source maps) needs the full span.
 
 ## Compiler (pascal-js-compiler)
 
-- [ ] Honor `var` (by-reference) parameters — today they compile as by-value.
+- [ ] Honor `var` (by-reference) parameters — today they are rejected with a
+      `CompileError` (emitting by-value would silently compute the wrong result).
 - [ ] Map Pascal types to richer JS runtime where it matters (integer vs real division).
 - [ ] Optional source maps.
 
