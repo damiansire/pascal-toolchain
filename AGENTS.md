@@ -71,8 +71,8 @@ Two kinds of coupling exist; they are versioned differently on purpose.
   so the workspace always resolves to a compatible sibling and the caret is
   safe and intended.
 - **Cross-repo deps** (libraries published from _other_ repos — currently
-  `counterweight-stack` and `objects-deep-compare`, consumed by
-  `pascal-code-formatter`) are **pinned to an exact version** (no caret, no
+  `counterweight-stack`, consumed by `pascal-code-formatter`) are **pinned to an
+  exact version** (no caret, no
   tilde). These come from a separate release train we do not control in this
   repo, so a `^`/`~` range would let an upstream patch/minor change behavior
   silently. Bumping one of these is a deliberate, reviewed change: update the

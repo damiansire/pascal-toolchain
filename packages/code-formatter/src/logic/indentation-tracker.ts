@@ -1,36 +1,17 @@
-import { CounterweightStack, CounterweightRule } from 'counterweight-stack';
-import { deepEqual } from 'objects-deep-compare';
 import { PascalToken } from 'pascal-tokenizer';
 import { FormatterToken } from '../shared/types';
 
-const beginToken: PascalToken = { type: 'KEYWORD', value: 'begin' };
-const endToken: PascalToken = { type: 'KEYWORD', value: 'end' };
-const varToken: PascalToken = { type: 'KEYWORD', value: 'var' };
+// The formatter's indentation is a begin/end/var nesting counter. `var` opens a
+// declaration level; `begin` closes any pending `var` level (dropping back to column 0)
+// and opens a code level; `end` closes a `begin` level. Tracked here as an explicit
+// stack of markers — no general-purpose counterweight structure or deep-equality needed,
+// which also drops two external dependencies from a per-token hot path.
+type NestingMarker = 'begin' | 'var';
 
-const rules: CounterweightRule<PascalToken>[] = [
-  {
-    mainElement: beginToken,
-    counterweights: [endToken],
-  },
-  {
-    mainElement: varToken,
-    counterweights: [beginToken],
-  },
-];
-
-/**
- * Reduces a token to the structural identity the rules match on: `{ type, value }`,
- * with keyword values lower-cased. Two things make this necessary before any
- * `deepEqual`/stack op: (1) Pascal is case-insensitive but the tokenizer preserves
- * source casing, so `VAR`/`Begin`/`END` must be folded to match the lower-case rule
- * constants; (2) tokens now carry `line/column/offset`, which the position-less rule
- * constants (`beginToken`, …) do not — deep-equating the whole token would never
- * match. Stripping to `{ type, value }` compares by identity, not by incidental position.
- */
-const canonicalize = (token: PascalToken): PascalToken => ({
-  type: token.type,
-  value: token.type === 'KEYWORD' ? token.value.toLowerCase() : token.value,
-});
+// Keyword value of a token, lower-cased (Pascal is case-insensitive but the tokenizer
+// preserves source casing), or null for non-keywords.
+const keywordValue = (token: PascalToken): string | null =>
+  token.type === 'KEYWORD' ? token.value.toLowerCase() : null;
 
 /**
  * Tracks Pascal nesting depth across the lines of a program. It is intentionally
@@ -38,35 +19,44 @@ const canonicalize = (token: PascalToken): PascalToken => ({
  * consumes each line, so it must be called once per line in source order.
  */
 class IndentationTracker {
-  private indentationStack: CounterweightStack<PascalToken>;
-  constructor() {
-    this.indentationStack = new CounterweightStack<PascalToken>(rules);
+  private readonly stack: NestingMarker[] = [];
+
+  private top(): NestingMarker | undefined {
+    return this.stack[this.stack.length - 1];
   }
+
   /**
    * Returns the indentation level for `tokens` and advances the internal nesting
    * stack. Stateful by design (not a pure function): later lines depend on the
    * begin/end/var tokens consumed from earlier ones.
    */
-  indentationForLine(tokens: FormatterToken[]) {
+  indentationForLine(tokens: FormatterToken[]): number {
     // Indentation is driven only by real keywords; drop the synthetic whitespace markers.
-    const real = tokens.filter((t): t is PascalToken => t.type !== 'WHITESPACE');
-    const canonical = real.map(canonicalize);
-    let currentIndent = this.indentationStack.size();
-    for (const token of canonical) {
-      const result = this.indentationStack.pop(token);
-      if (result?.type === 'KEYWORD') {
-        if (result?.value === 'var') {
-          currentIndent = 0;
-        }
+    const keywords = tokens
+      .filter((t): t is PascalToken => t.type !== 'WHITESPACE')
+      .map(keywordValue)
+      .filter((v): v is string => v !== null);
+
+    let currentIndent = this.stack.length;
+
+    // Closers first (mirrors the original pop-then-push order): `begin` cancels a pending
+    // `var` and returns to column 0; `end` cancels the enclosing `begin`.
+    for (const kw of keywords) {
+      if (kw === 'begin' && this.top() === 'var') {
+        this.stack.pop();
+        currentIndent = 0;
+      } else if (kw === 'end' && this.top() === 'begin') {
+        this.stack.pop();
       }
     }
-    for (const token of canonical) {
-      if (deepEqual(token, varToken) || deepEqual(token, beginToken)) {
-        this.indentationStack.push(token);
+    // Then openers: `var` and `begin` each push a nesting level.
+    for (const kw of keywords) {
+      if (kw === 'var' || kw === 'begin') {
+        this.stack.push(kw);
       }
     }
-    if (canonical.some((token) => deepEqual(token, endToken))) {
-      currentIndent = this.indentationStack.size();
+    if (keywords.includes('end')) {
+      currentIndent = this.stack.length;
     }
     return currentIndent;
   }
