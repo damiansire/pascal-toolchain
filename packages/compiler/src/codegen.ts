@@ -64,6 +64,14 @@ const UNARY_OPERATORS: Record<string, string> = {
   '+': '+',
 };
 
+// Builtins the compiler rewrites, split by the position where they are valid. Using one
+// in the wrong position (`abs(x);` as a statement, or `inc(x)` inside an expression)
+// would otherwise emit a call to a JS function that does not exist — a runtime
+// ReferenceError instead of a compile-time error. A user subprogram of the same name
+// shadows these and is handled before either set is consulted.
+const EXPRESSION_BUILTINS = new Set(['abs', 'sqrt', 'sqr', 'trunc', 'round', 'odd']);
+const STATEMENT_BUILTINS = new Set(['writeln', 'write', 'inc', 'dec']);
+
 class CodeGenerator {
   private readonly indentUnit: string;
   /** Name of the function currently being generated, for return-by-name lowering. */
@@ -342,6 +350,12 @@ class CodeGenerator {
       return `${pad}${args[0]} ${op} ${amount};`;
     }
 
+    // A value-returning builtin (abs, sqrt, …) has no statement form; emitting a plain
+    // call would compile to a nonexistent JS function. Reject it instead of ReferenceError.
+    if (EXPRESSION_BUILTINS.has(name)) {
+      throw new CompileError(`'${name}' is a function and cannot be used as a statement.`);
+    }
+
     return `${pad}${this.mapIdentifier(statement.name)}(${args.join(', ')});`;
   }
 
@@ -430,7 +444,15 @@ class CodeGenerator {
         const e = expression;
         const args = e.arguments.map((a) => this.genExpression(a));
         const builtin = this.genBuiltinCall(e.callee, args);
-        return builtin ?? `${this.mapIdentifier(e.callee)}(${args.join(', ')})`;
+        if (builtin !== null) return builtin;
+        // A statement-only builtin (writeln/write/inc/dec) has no value; using it in an
+        // expression would emit a call to a nonexistent JS function. Reject it — unless a
+        // user subprogram of that name shadows it, in which case it is a real call.
+        const name = e.callee.toLowerCase();
+        if (STATEMENT_BUILTINS.has(name) && !this.userSubprograms.has(name)) {
+          throw new CompileError(`'${name}' is a statement and cannot be used in an expression.`);
+        }
+        return `${this.mapIdentifier(e.callee)}(${args.join(', ')})`;
       }
       case 'IndexExpression': {
         const e = expression;

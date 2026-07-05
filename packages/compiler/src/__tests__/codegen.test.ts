@@ -183,6 +183,22 @@ describe('pascal-js-compiler — rejects unsupported features (error contract)',
     );
   });
 
+  it('a value-returning builtin used as a statement is a CompileError (not a runtime ReferenceError)', () => {
+    expect(() => compile('program P; var x: integer; begin abs(x); end.')).toThrow(CompileError);
+  });
+
+  it('a statement-only builtin used in an expression is a CompileError', () => {
+    expect(() => compile('program P; var x: integer; begin x := writeln(1); end.')).toThrow(
+      CompileError,
+    );
+  });
+
+  it('a user subprogram shadowing a builtin name still compiles in either position', () => {
+    expect(() =>
+      compile('program P; procedure abs(y: integer); begin end; begin abs(1); end.'),
+    ).not.toThrow();
+  });
+
   it('rejects unsupported AST declaration/statement/expression nodes', () => {
     expect(() =>
       generate(
