@@ -25,12 +25,13 @@ class FormatterController {
   private processToken(currentToken: PascalToken, nextToken: PascalToken | undefined) {
     this.addTokenToCurrentLine(currentToken);
 
-    const addWhiteSpace = needWhiteSpace(currentToken, nextToken);
-    if (addWhiteSpace) {
+    const finishLine = isEndOfLine(currentToken, nextToken);
+    // Only separate from the next token when it stays on this line; a token that ends
+    // the line must not carry a trailing whitespace marker.
+    if (!finishLine && needWhiteSpace(currentToken, nextToken)) {
       this.addWhiteSpace();
     }
 
-    const finishLine = isEndOfLine(currentToken, nextToken);
     if (finishLine) {
       this.finalizeLine();
     }

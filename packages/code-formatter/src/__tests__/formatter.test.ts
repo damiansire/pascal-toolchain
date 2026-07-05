@@ -1,4 +1,5 @@
 import { formatPascalCode } from '../formatter';
+import { parse } from 'pascal-parser';
 import { FormattedPascalLine } from '../shared/types';
 import { WhiteSpace, EmptyLine, DELIMITER_SEMICOLON } from '../shared/elements';
 import {
@@ -269,5 +270,39 @@ describe('one line test', () => {
 
   test('the second line is begin', () => {
     expect(result[1]).toMatchObject(createBeginLine());
+  });
+});
+
+describe('formatPascalCode output re-parses (round-trip)', () => {
+  // Renders the structured lines back to a single Pascal string, the way a consumer
+  // that wants text (not the line structure) would. If needWhiteSpace glues two word
+  // tokens, the rendered text fails to tokenize/parse — which is exactly the bug this
+  // guards. Bodies live on the SAME line as their for/while/if header here, the path
+  // the older spacing tests never exercised.
+  const render = (lines: FormattedPascalLine[]): string =>
+    lines.map((l) => '  '.repeat(l.indentation) + l.tokens.map((t) => t.value).join('')).join('\n');
+
+  const programs: Record<string, string> = {
+    forLoop: 'program p; var i: integer; begin for i := 1 to 5 do writeln(i); end.',
+    whileLoop: 'program p; var i: integer; begin i := 0; while i < 3 do i := i + 1; end.',
+    ifThen: 'program p; var x: integer; begin if x > 0 then writeln(x); end.',
+    caseOf:
+      "program p; var n: integer; begin case n of 1: writeln('one'); 2: writeln('two'); end; end.",
+  };
+
+  for (const [name, src] of Object.entries(programs)) {
+    it(`re-parses without throwing: ${name}`, () => {
+      const rendered = render(formatPascalCode(src));
+      expect(() => parse(rendered)).not.toThrow();
+    });
+  }
+
+  it('keeps for/to/do/then separated from the surrounding tokens', () => {
+    const text = render(
+      formatPascalCode('program p; var i: integer; begin for i := 1 to 5 do writeln(i); end.'),
+    );
+    expect(text).toContain('for i := 1 to 5 do writeln(i);');
+    // No glued word tokens (the bug this guards): `fori`, `1to`, `to5`, `5do`, `dowriteln`.
+    expect(text).not.toMatch(/fori|1to|to5|5do|dowriteln/);
   });
 });

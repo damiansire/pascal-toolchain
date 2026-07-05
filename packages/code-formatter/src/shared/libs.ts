@@ -18,6 +18,26 @@ const isOperator = (token: PascalToken): boolean => {
   ].includes(token?.type);
 };
 
+// "Word" tokens render as their literal text, so two adjacent ones would merge into a
+// single token on output (`to`+`5` -> `to5`, `do`+`writeln` -> `dowriteln`). Note the
+// word operators (div/mod/and/or/not) are NOT keywords to the tokenizer — they arrive
+// as identifiers — so IDENTIFIER covers them here too.
+const isWordLike = (token: PascalToken): boolean => {
+  return [
+    'KEYWORD',
+    'IDENTIFIER',
+    'NUMBER_INTEGER',
+    'NUMBER_REAL',
+    'BOOLEAN_LITERAL',
+    'STRING_LITERAL',
+  ].includes(token?.type);
+};
+
+// Control keywords still need a leading space when they follow a closing paren/bracket
+// or literal (`while (c) do`, `if (c) then`, `case x of`), which the word-word rule
+// alone would miss because the preceding `)`/`]` is not word-like.
+const CONTROL_KEYWORDS = new Set(['then', 'else', 'do', 'of', 'to', 'downto']);
+
 const isStatement = (type: LineType): boolean => {
   return ['IF_STATEMENT', 'WHILE_STATEMENT', 'REPEAT_STATEMENT', 'FOR_STATEMENT'].includes(type);
 };
@@ -61,21 +81,25 @@ const needWhiteSpace = (currentToken: PascalToken, nextToken: PascalToken | unde
     return false;
   }
 
-  // Pascal is case-insensitive and the tokenizer preserves the original casing,
-  // so keyword checks must normalize (like getLineType/isEndOfLine already do);
-  // otherwise IF/THEN/PROGRAM in uppercase silently lose their spacing.
-  if (nextToken.type === 'KEYWORD' && nextToken.value.toLowerCase() === 'then') {
+  // Comments always get a leading space.
+  if (isComment(nextToken)) {
     return true;
   }
 
-  if (currentToken.type === 'KEYWORD') {
-    if (currentToken.value.toLowerCase() === 'program') {
-      return true;
-    }
-    if (currentToken.value.toLowerCase() === 'if') {
-      return true;
-    }
+  // Two adjacent word tokens must be separated or the output re-tokenizes wrong
+  // (`for`+`i`, `to`+`5`, `do`+`writeln`, `a`+`div`). This is the general rule that
+  // keeps formatPascalCode output re-parseable; the specific rules below only add
+  // spacing around punctuation the word-word rule doesn't reach.
+  if (isWordLike(currentToken) && isWordLike(nextToken)) {
+    return true;
   }
+
+  // A control keyword after a `)`/`]`/other non-word token: `while (c) do`, `case x of`.
+  // Normalized to lower-case since the tokenizer preserves the source casing.
+  if (nextToken.type === 'KEYWORD' && CONTROL_KEYWORDS.has(nextToken.value.toLowerCase())) {
+    return true;
+  }
+
   if (currentToken.type === 'IDENTIFIER' && isOperator(nextToken)) {
     return true;
   }
@@ -89,10 +113,6 @@ const needWhiteSpace = (currentToken: PascalToken, nextToken: PascalToken | unde
   }
 
   if (isOperator(currentToken)) {
-    return true;
-  }
-
-  if (isComment(nextToken)) {
     return true;
   }
 
