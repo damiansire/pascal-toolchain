@@ -1,7 +1,11 @@
-import { expectType, expectError } from 'tsd';
-import { compile, generate } from 'pascal-js-compiler';
+import { expectType, expectError, expectAssignable } from 'tsd';
+import { compile, generate, CompileError } from 'pascal-js-compiler';
 import type { CompileOptions } from 'pascal-js-compiler';
 import type { Program } from 'pascal-parser';
+
+// CompileError is exported, constructs from a message, and is an Error subtype.
+expectType<CompileError>(new CompileError('unsupported'));
+expectAssignable<Error>(new CompileError('unsupported'));
 
 // compile(source, options?) -> string (full source-to-JS path).
 expectType<string>(compile('program p; begin end.'));

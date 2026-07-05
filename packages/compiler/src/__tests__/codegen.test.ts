@@ -1,4 +1,4 @@
-import { compile, generate } from '../codegen';
+import { compile, generate, CompileError } from '../codegen';
 import type { Program } from 'pascal-parser';
 
 /** Builds an AST loosely for unit tests without restating every field type. */
@@ -156,9 +156,10 @@ describe('pascal-js-compiler — code generation (generate)', () => {
 
 describe('pascal-js-compiler — rejects unsupported features (error contract)', () => {
   it("rejects 'var' (by-reference) parameters loudly", () => {
-    expect(() =>
-      compile('program P; procedure r(var x: integer); begin x := 0; end; begin end.'),
-    ).toThrow(/by-reference/);
+    const src = 'program P; procedure r(var x: integer); begin x := 0; end; begin end.';
+    expect(() => compile(src)).toThrow(/by-reference/);
+    // Typed error: a consumer can catch "unsupported Pascal" apart from an internal bug.
+    expect(() => compile(src)).toThrow(CompileError);
   });
 
   it('rejects bitwise and/or over clearly-integer operands', () => {
@@ -166,13 +167,19 @@ describe('pascal-js-compiler — rejects unsupported features (error contract)',
       /Bitwise 'and'/,
     );
     expect(() => compile('program P; var x: integer; begin x := 12 or 10; end.')).toThrow(
-      /Bitwise 'or'/,
+      CompileError,
     );
   });
 
   it("rejects bitwise 'not' over a clearly-integer operand", () => {
     expect(() => compile('program P; var x: integer; begin x := not 0; end.')).toThrow(
-      /Bitwise 'not'/,
+      CompileError,
+    );
+  });
+
+  it('a wrong-arity builtin call is a CompileError', () => {
+    expect(() => compile('program P; var x: integer; begin x := abs(1, 2); end.')).toThrow(
+      CompileError,
     );
   });
 

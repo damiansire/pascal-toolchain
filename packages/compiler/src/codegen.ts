@@ -20,6 +20,20 @@ import {
   Expression,
 } from 'pascal-parser';
 
+/**
+ * Error thrown when a syntactically valid program uses a Pascal feature this
+ * compiler does not support — `var` (by-reference) parameters, bitwise and/or/not
+ * over integers, or a builtin called with the wrong arity. Typed and exported so a
+ * consumer can catch "unsupported Pascal" distinctly from an internal compiler bug,
+ * which stays a plain `Error` (see `assertNever`).
+ */
+export class CompileError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CompileError';
+  }
+}
+
 /** Options controlling the generated output. */
 export interface CompileOptions {
   /** Indentation unit. Defaults to two spaces. */
@@ -159,7 +173,7 @@ class CodeGenerator {
     const parameters = declaration.parameters;
     const byRef = parameters.find((p) => p.isVar);
     if (byRef) {
-      throw new Error(
+      throw new CompileError(
         `'var' (by-reference) parameter '${byRef.name}' in '${declaration.name}' is not supported.`,
       );
     }
@@ -326,7 +340,7 @@ class CodeGenerator {
     // Math.abs(undefined) → NaN or silently dropping extra arguments.
     const requireUnary = () => {
       if (args.length !== 1) {
-        throw new Error(`Builtin '${name}' expects exactly 1 argument, got ${args.length}.`);
+        throw new CompileError(`Builtin '${name}' expects exactly 1 argument, got ${args.length}.`);
       }
     };
     switch (name) {
@@ -365,7 +379,7 @@ class CodeGenerator {
           (op === 'and' || op === 'or') &&
           (this.isIntegerExpression(e.left) || this.isIntegerExpression(e.right))
         ) {
-          throw new Error(
+          throw new CompileError(
             `Bitwise '${op}' over integers is not supported; only boolean '${op}' is.`,
           );
         }
@@ -382,7 +396,9 @@ class CodeGenerator {
         // 'not' is lowered to '!'. Pascal's bitwise 'not' over integers ('not 0' = -1)
         // is not supported by this boolean-only subset; reject clearly-integer operands.
         if (e.operator.toLowerCase() === 'not' && this.isIntegerExpression(e.argument)) {
-          throw new Error("Bitwise 'not' over integers is not supported; only boolean 'not' is.");
+          throw new CompileError(
+            "Bitwise 'not' over integers is not supported; only boolean 'not' is.",
+          );
         }
         return `(${this.mapUnary(e.operator)}${this.genExpression(e.argument)})`;
       }
