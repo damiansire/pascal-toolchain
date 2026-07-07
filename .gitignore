@@ -7,3 +7,7 @@ coverage/
 .idea/
 .vscode/
 .npmrc
+
+# Artefactos de Fragua (no versionar)
+_audit/
+_audits/
