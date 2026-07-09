@@ -39,9 +39,13 @@ end.`;
                 },
               },
             ],
+            // Statements are stamped with their first token's position (parseStatement),
+            // so this CallStatement carries `writeln`'s real line/column/offset. The
+            // StringLiteral argument above is an expression and stays zeroed, as does
+            // the Program node below — neither has a position consumer yet.
             location: {
-              start: { line: 0, column: 0, offset: 0 },
-              end: { line: 0, column: 0, offset: 0 },
+              start: { line: 4, column: 5, offset: 31 },
+              end: { line: 4, column: 12, offset: 38 },
             },
           },
         ],

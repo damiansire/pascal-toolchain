@@ -17,8 +17,10 @@ procedural subset (see README); these extend it.
 - [x] **Real source locations (tokens)** — the tokenizer stamps 1-based line/column and
       0-based offset on every token, and `ParseError` reports `at line L, column C` with a
       `location` (pending release via Changesets).
-- [ ] **AST node source locations** — nodes still carry a zeroed `location`; propagate the
-      token positions into them once a consumer (e.g. source maps) needs the full span.
+- [~] **AST node source locations** — statement nodes now carry a real start position
+      (stamped from their first token in `parseStatement`), for the playground debugger.
+      Still pending: expression/declaration nodes, and the full first-token..last-token
+      span (statements currently carry only the start token's span).
 
 ## Compiler (pascal-js-compiler)
 

@@ -140,13 +140,12 @@ class Parser {
     };
   }
 
-  // AST nodes still carry a zeroed location. Tokens now expose real line/column/offset
-  // (see locationOf), but a node's true span runs first-token..last-token, which means
-  // threading a start token through every node constructor. No consumer reads node
-  // locations today (codegen ignores them; there are no source maps yet), so stamping
-  // them now would be speculative surface — the exact "promise a position nothing uses"
-  // trap. Deferred until a consumer (source maps) needs it. Error positions, which DO
-  // have a consumer, flow through parseError/locationOf instead.
+  // Zeroed-location placeholder for nodes with no consumer for their position yet
+  // (expressions, declarations, blocks). Statements ARE stamped with a real start
+  // position in parseStatement, now that the playground step-debugger reads them to
+  // highlight the current source line; the rest stay zeroed until they too gain a
+  // consumer, rather than threading positions everywhere speculatively. Error
+  // positions flow through parseError/locationOf instead.
   private location(): SourceLocation {
     return {
       start: { line: 0, column: 0, offset: 0 },
@@ -358,7 +357,15 @@ class Parser {
   private parseStatement(): Statement {
     this.enter();
     try {
-      return this.parseStatementInner();
+      const startToken = this.peek();
+      const statement = this.parseStatementInner();
+      // Stamp the statement with its first token's position. A node's full span is
+      // first-token..last-token, but the consumer that motivated this (the playground
+      // step-debugger) maps a step back to its source *line*, for which the start
+      // position is what matters. Expressions/declarations stay zeroed until they too
+      // gain a consumer.
+      statement.location = this.locationOf(startToken);
+      return statement;
     } finally {
       this.leave();
     }
