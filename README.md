@@ -35,10 +35,14 @@ the parser's AST into runnable JavaScript.
 
 ## Playground
 
+**[Try it live →](https://damiansire.github.io/pascal-toolchain/)**
+
 [`playground/`](./playground) is an interactive web app: type Pascal and watch the
 tokens, AST, formatted source and compiled JavaScript update live — then hit **Run** to
 execute the compiled output in the browser. Its editor is syntax-highlighted by the
 toolchain's own tokenizer.
+
+Run it locally:
 
 ```bash
 cd playground && npm install && npm run dev

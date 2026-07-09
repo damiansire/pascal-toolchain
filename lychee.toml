@@ -1,0 +1,19 @@
+# lychee config for the README/docs link check (.github/workflows/links.yml).
+
+# Don't check page anchors/fragments (e.g. #readme) — many valid targets omit them.
+include_fragments = false
+
+# Retry transient failures before flagging a link as dead.
+max_retries = 3
+retry_wait_time = 2
+
+# Treat these as reachable: npmjs.com returns 403 to CI/bot traffic even for
+# packages that exist (verified live via the npm registry), so checking the
+# public package page would be a false positive.
+accept = [200, 403, 429]
+
+exclude = [
+  # Local dev servers referenced in setup instructions, never reachable in CI.
+  "^https?://localhost",
+  "^https?://127\\.0\\.0\\.1",
+]
