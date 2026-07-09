@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "pascal-tokenizer": ["../packages/tokenizer/dist/index.d.ts"],
+      "pascal-parser": ["../packages/parser/dist/index.d.ts"],
+      "pascal-js-compiler": ["../packages/compiler/dist/index.d.ts"],
+      "pascal-code-formatter": ["../packages/code-formatter/dist/index.d.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts"]
+}

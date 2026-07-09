@@ -33,6 +33,17 @@ source.pas
 The pipeline is now complete end to end: `pascal-js-compiler` closes it by turning
 the parser's AST into runnable JavaScript.
 
+## Playground
+
+[`playground/`](./playground) is an interactive web app: type Pascal and watch the
+tokens, AST, formatted source and compiled JavaScript update live — then hit **Run** to
+execute the compiled output in the browser. Its editor is syntax-highlighted by the
+toolchain's own tokenizer.
+
+```bash
+cd playground && npm install && npm run dev
+```
+
 ## Development
 
 ```bash

@@ -29,6 +29,9 @@ procedural subset (see README); these extend it.
 
 ## Tooling / infra
 
+- [x] **Interactive playground** (`playground/`) — live tokens / AST / formatted / compiled
+      JS with a Run button, editor highlighted by the toolchain's own lexer. Consumes the
+      packages from source via Vite aliases; samples are the compiler golden fixtures.
 - [ ] **Publish to GitHub** + GitHub Actions CI (build, test, changesets release).
 - [ ] First npm release via Changesets (`pascal-parser` is unpublished; `pascal-js-compiler` is new).
 - [ ] **FPC conformance harness** — clone `FPCSource/tests/`, attempt to compile each
