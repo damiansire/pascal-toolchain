@@ -25,13 +25,13 @@ working tree of `../packages`.
 
 ## Scripts
 
-| Script              | What it does                                            |
-| ------------------- | ------------------------------------------------------- |
-| `npm run dev`       | Vite dev server with HMR.                               |
+| Script              | What it does                                                  |
+| ------------------- | ------------------------------------------------------------- |
+| `npm run dev`       | Vite dev server with HMR.                                     |
 | `npm run build`     | Production build to `dist/` (relative `base`, host-agnostic). |
-| `npm run preview`   | Serve the production build.                             |
-| `npm test`          | Vitest: highlighter round-trip + end-to-end compile/run. |
-| `npm run typecheck` | `tsc --noEmit` against the packages' built `.d.ts`.     |
+| `npm run preview`   | Serve the production build.                                   |
+| `npm test`          | Vitest: highlighter round-trip + end-to-end compile/run.      |
+| `npm run typecheck` | `tsc --noEmit` against the packages' built `.d.ts`.           |
 
 ## Samples
 

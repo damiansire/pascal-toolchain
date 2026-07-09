@@ -30,14 +30,12 @@ function guard<T>(fn: () => T): StageResult<T> {
 export const runTokenize = (source: string): StageResult<PascalToken[]> =>
   guard(() => tokenizePascal(source, false));
 
-export const runParse = (source: string): StageResult<Program> =>
-  guard(() => parse(source));
+export const runParse = (source: string): StageResult<Program> => guard(() => parse(source));
 
 export const runFormat = (source: string): StageResult<string> =>
   guard(() => formatPascalSource(source));
 
-export const runCompile = (source: string): StageResult<string> =>
-  guard(() => compile(source));
+export const runCompile = (source: string): StageResult<string> => guard(() => compile(source));
 
 /** Cheap validity check for the status bar (does not throw). */
 export const sourceIsValid = (source: string): boolean => {

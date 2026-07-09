@@ -18,9 +18,9 @@ procedural subset (see README); these extend it.
       0-based offset on every token, and `ParseError` reports `at line L, column C` with a
       `location` (pending release via Changesets).
 - [~] **AST node source locations** — statement nodes now carry a real start position
-      (stamped from their first token in `parseStatement`), for the playground debugger.
-      Still pending: expression/declaration nodes, and the full first-token..last-token
-      span (statements currently carry only the start token's span).
+  (stamped from their first token in `parseStatement`), for the playground debugger.
+  Still pending: expression/declaration nodes, and the full first-token..last-token
+  span (statements currently carry only the start token's span).
 
 ## Compiler (pascal-js-compiler)
 

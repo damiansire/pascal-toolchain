@@ -15,10 +15,7 @@ export function highlightGroup(type: TokenType): string {
 
 /** Minimal HTML escaping for text rendered into the overlay via innerHTML. */
 export function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /**

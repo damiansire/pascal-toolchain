@@ -315,7 +315,8 @@ class Tracer {
 
   private evalBinary(expr: import('pascal-parser').BinaryExpression): Value {
     const op = expr.operator.toLowerCase();
-    if (op === 'and') return this.asBool(this.eval(expr.left)) && this.asBool(this.eval(expr.right));
+    if (op === 'and')
+      return this.asBool(this.eval(expr.left)) && this.asBool(this.eval(expr.right));
     if (op === 'or') return this.asBool(this.eval(expr.left)) || this.asBool(this.eval(expr.right));
     const l = this.eval(expr.left);
     const r = this.eval(expr.right);
@@ -366,7 +367,12 @@ class Tracer {
     throw new RuntimeError(`undefined variable: ${display}`);
   }
 
-  private step(node: Statement | Expression, kind: StepKind, note: string, focus?: Step['focus']): void {
+  private step(
+    node: Statement | Expression,
+    kind: StepKind,
+    note: string,
+    focus?: Step['focus'],
+  ): void {
     if (this.steps.length >= STEP_LIMIT) throw new StepLimit();
     this.steps.push({
       line: node.location?.start.line ?? 0,

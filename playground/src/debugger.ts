@@ -204,7 +204,9 @@ function renderDiagram(step: Step): string {
           return `<div class="cell ${lit}"><span class="cell__i">${idx}</span><span class="cell__v">${escapeHtml(fmt(item))}</span></div>`;
         })
         .join('');
-      parts.push(`<div class="diagram__array"><span class="diagram__name">${escapeHtml(name)}</span><div class="cells">${cells}</div></div>`);
+      parts.push(
+        `<div class="diagram__array"><span class="diagram__name">${escapeHtml(name)}</span><div class="cells">${cells}</div></div>`,
+      );
     }
   }
 
@@ -215,14 +217,19 @@ function renderDiagram(step: Step): string {
       .map((f) => `<div class="framebox">${escapeHtml(frameLabel(f))}</div>`)
       .reverse()
       .join('');
-    parts.push(`<div class="diagram__frames"><span class="diagram__name">call stack</span>${frames}</div>`);
+    parts.push(
+      `<div class="diagram__frames"><span class="diagram__name">call stack</span>${frames}</div>`,
+    );
   }
 
   // Scalars of the current frame as chips, so simple loops still visualize.
   const current = step.stack[step.stack.length - 1];
   const chips = Object.entries(current.vars)
     .filter(([, v]) => !isArrayValue(v))
-    .map(([n, v]) => `<span class="chip"><span class="chip__n">${escapeHtml(n)}</span>${escapeHtml(fmt(v))}</span>`)
+    .map(
+      ([n, v]) =>
+        `<span class="chip"><span class="chip__n">${escapeHtml(n)}</span>${escapeHtml(fmt(v))}</span>`,
+    )
     .join('');
   if (chips) parts.push(`<div class="diagram__chips">${chips}</div>`);
 

@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  runTokenize,
-  runParse,
-  runFormat,
-  runCompile,
-  sourceIsValid,
-} from '../toolchain';
+import { runTokenize, runParse, runFormat, runCompile, sourceIsValid } from '../toolchain';
 import { runCompiledJs } from '../render';
 import { SAMPLES } from '../samples';
 

@@ -1,13 +1,7 @@
 import './style.css';
 import { createEditor } from './editor';
 import { SAMPLES, DEFAULT_SAMPLE } from './samples';
-import {
-  runTokenize,
-  runParse,
-  runFormat,
-  runCompile,
-  sourceIsValid,
-} from './toolchain';
+import { runTokenize, runParse, runFormat, runCompile, sourceIsValid } from './toolchain';
 import {
   renderTokens,
   renderAst,

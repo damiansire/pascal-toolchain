@@ -1,15 +1,15 @@
 /* ---- Theme tokens -------------------------------------------------------- */
 :root {
-  --code-font: "JetBrains Mono", "Fira Code", "SF Mono", "Cascadia Code",
-    Consolas, "Liberation Mono", monospace;
+  --code-font:
+    'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', Consolas, 'Liberation Mono',
+    monospace;
   --code-size: 13px;
   --code-lh: 1.6;
-  --ui-font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
-    sans-serif;
+  --ui-font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   --radius: 10px;
 }
 
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
   --bg: #0b1020;
   --bg-elev: #121a30;
   --bg-inset: #0a0f1e;
@@ -32,7 +32,7 @@
   --tok-punct: #9fb0d4;
 }
 
-:root[data-theme="light"] {
+:root[data-theme='light'] {
   --bg: #f5f7fc;
   --bg-elev: #ffffff;
   --bg-inset: #eef1f8;
@@ -140,7 +140,9 @@ body {
   border-radius: 8px;
   padding: 6px 12px;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
 }
 .ghost-btn:hover {
   color: var(--fg);
@@ -302,12 +304,14 @@ body {
   border-bottom: 2px solid transparent;
   padding: 6px 10px;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
 }
 .tab:hover {
   color: var(--fg);
 }
-.tab[aria-selected="true"] {
+.tab[aria-selected='true'] {
   color: var(--fg);
   border-bottom-color: var(--accent);
 }
@@ -510,7 +514,9 @@ body {
   height: 30px;
   padding: 0 8px;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 .dbg__btn:hover {
   border-color: var(--accent-deep);
@@ -697,7 +703,9 @@ body {
   border-radius: 7px;
   overflow: hidden;
   background: var(--bg-inset);
-  transition: border-color 0.15s, transform 0.15s;
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
 }
 .cell.is-focus {
   border-color: var(--accent);
