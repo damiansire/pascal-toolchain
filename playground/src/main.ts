@@ -16,10 +16,13 @@ import {
   runCompiledJs,
   errorCard,
 } from './render';
+import { trace, type TraceResult } from './tracer';
+import { createDebugger } from './debugger';
 
-type TabId = 'tokens' | 'ast' | 'formatted' | 'js';
+type TabId = 'tokens' | 'ast' | 'formatted' | 'js' | 'debug';
 
 const TABS: ReadonlyArray<{ id: TabId; label: string }> = [
+  { id: 'debug', label: 'Debugger' },
   { id: 'tokens', label: 'Tokens' },
   { id: 'ast', label: 'AST' },
   { id: 'formatted', label: 'Formatted' },
@@ -59,6 +62,7 @@ app.innerHTML = `
         <button id="run" class="run-btn" type="button" hidden>${PLAY_ICON}<span>Run</span></button>
       </div>
       <div id="output" class="pane__body pane__body--scroll" role="tabpanel"></div>
+      <div id="debug" class="pane__body pane__body--scroll" role="tabpanel" hidden></div>
       <div id="console" class="console" hidden></div>
     </section>
   </main>
@@ -72,6 +76,7 @@ app.innerHTML = `
 const selectEl = app.querySelector<HTMLSelectElement>('#sample')!;
 const tabsEl = app.querySelector<HTMLElement>('.tabs')!;
 const outputEl = app.querySelector<HTMLElement>('#output')!;
+const debugEl = app.querySelector<HTMLElement>('#debug')!;
 const consoleEl = app.querySelector<HTMLElement>('#console')!;
 const runBtn = app.querySelector<HTMLButtonElement>('#run')!;
 const themeBtn = app.querySelector<HTMLButtonElement>('#theme')!;
@@ -82,8 +87,8 @@ const statusTime = app.querySelector<HTMLElement>('#status-time')!;
 // Populate the sample picker.
 selectEl.innerHTML = SAMPLES.map((s) => `<option value="${s.id}">${s.label}</option>`).join('');
 
-// Build the tab bar.
-let activeTab: TabId = 'tokens';
+// Build the tab bar. The debugger is the headline view, so it opens first.
+let activeTab: TabId = 'debug';
 tabsEl.innerHTML = TABS.map(
   (t) =>
     `<button class="tab" role="tab" data-tab="${t.id}" aria-selected="${t.id === activeTab}">${t.label}</button>`,
@@ -95,6 +100,7 @@ interface Computed {
   ast: ReturnType<typeof runParse>;
   formatted: ReturnType<typeof runFormat>;
   js: ReturnType<typeof runCompile>;
+  trace: TraceResult;
   valid: boolean;
   totalMs: number;
 }
@@ -105,15 +111,25 @@ function compute(source: string): Computed {
   const ast = runParse(source);
   const formatted = runFormat(source);
   const js = runCompile(source);
+  const traced = trace(source);
   const valid = sourceIsValid(source);
   const totalMs = tokens.ms + ast.ms + formatted.ms + js.ms;
-  return { tokens, ast, formatted, js, valid, totalMs };
+  return { tokens, ast, formatted, js, trace: traced, valid, totalMs };
 }
 
 function renderActive(): void {
   if (!latest) return;
+  const onDebug = activeTab === 'debug';
+  outputEl.hidden = onDebug;
+  debugEl.hidden = !onDebug;
   runBtn.hidden = activeTab !== 'js';
   consoleEl.hidden = true;
+  if (onDebug) {
+    // The debugger owns the editor's active-line band; it renders itself here.
+    dbg.setTrace(latest.trace);
+    return;
+  }
+  dbg.stop(); // clear the active-line band when leaving the debugger
   if (activeTab === 'tokens') outputEl.innerHTML = renderTokens(latest.tokens);
   else if (activeTab === 'ast') outputEl.innerHTML = renderAst(latest.ast);
   else if (activeTab === 'formatted') outputEl.innerHTML = renderFormatted(latest.formatted);
@@ -151,6 +167,9 @@ function scheduleRefresh(source: string): void {
 const editor = createEditor(app.querySelector<HTMLElement>('#editor')!, {
   onInput: scheduleRefresh,
 });
+
+// The step-debugger renders into its own panel and drives the editor's active line.
+const dbg = createDebugger(debugEl, editor);
 
 // Tab clicks.
 tabsEl.addEventListener('click', (event) => {
