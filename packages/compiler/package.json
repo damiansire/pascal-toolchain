@@ -30,6 +30,7 @@
     "url": "git+https://github.com/damiansire/pascal-toolchain.git",
     "directory": "packages/compiler"
   },
+  "homepage": "https://github.com/damiansire/pascal-toolchain/tree/main/packages/compiler#readme",
   "keywords": [
     "pascal",
     "compiler",

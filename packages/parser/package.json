@@ -20,6 +20,7 @@
     "url": "git+https://github.com/damiansire/pascal-toolchain.git",
     "directory": "packages/parser"
   },
+  "homepage": "https://github.com/damiansire/pascal-toolchain/tree/main/packages/parser#readme",
   "files": [
     "dist",
     "README.md"
