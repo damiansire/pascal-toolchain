@@ -33,6 +33,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:types": "tsd",
+    "bench": "node bench/parse-bench.js",
     "format": "prettier --write \"src/**/*.ts\"",
     "prepublishOnly": "npm run build && npm test",
     "docs": "typedoc --out docs src"

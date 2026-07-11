@@ -14,4 +14,14 @@ export default tseslint.config(
       globals: { module: 'writable', require: 'readonly', process: 'readonly' },
     },
   },
+  // Standalone benchmark scripts: plain CommonJS run directly with `node`,
+  // not part of the published package or the type-checked src/ tree.
+  {
+    files: ['**/bench/**/*.js'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: { module: 'writable', require: 'readonly', console: 'readonly' },
+    },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
 );
