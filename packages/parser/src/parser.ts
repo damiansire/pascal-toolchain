@@ -51,13 +51,42 @@ const TYPE_KEYWORDS = new Set(['integer', 'real', 'char', 'string', 'boolean']);
  */
 const MAX_NESTING_DEPTH = 500;
 
+/**
+ * Options controlling how {@link Parser} reacts to a syntax error.
+ */
+export interface ParseOptions {
+  /**
+   * When true, a statement-level syntax error is recorded instead of thrown:
+   * the parser synchronizes (skips tokens up to the next likely statement
+   * boundary — a ';' or a statement-starting keyword) and keeps parsing, so a
+   * single pass can surface multiple diagnostics. Defaults to false, which
+   * preserves the original "throw on first error" behavior relied on by
+   * `pascal-js-compiler` and `pascal-code-formatter`.
+   */
+  recoverFromErrors?: boolean;
+}
+
+/** Result of a recovery-mode parse: the best-effort AST plus every error found. */
+export interface ParseResult {
+  program: Program;
+  errors: ParseError[];
+}
+
 class Parser {
   private tokens: PascalToken[] = [];
   private current: number = 0;
   private depth = 0;
+  private readonly recoverFromErrors: boolean;
+  private readonly errors: ParseError[] = [];
 
-  constructor(source: string) {
+  constructor(source: string, options: ParseOptions = {}) {
     this.tokens = tokenizePascal(source);
+    this.recoverFromErrors = options.recoverFromErrors ?? false;
+  }
+
+  /** Diagnostics collected in recovery mode. Empty when `recoverFromErrors` is off. */
+  getErrors(): ParseError[] {
+    return this.errors;
   }
 
   /** Guards recursive descent against unbounded nesting (DoS). Throws ParseError. */
@@ -344,7 +373,21 @@ class Parser {
       // right before the closer) is an empty statement, not a syntax error.
       // Skip it instead of trying to parse a statement out of the ';'.
       if (this.match('DELIMITER_SEMICOLON')) continue;
-      statements.push(this.parseStatement());
+      if (this.recoverFromErrors) {
+        try {
+          statements.push(this.parseStatement());
+        } catch (e) {
+          if (!(e instanceof ParseError)) throw e;
+          this.errors.push(e);
+          this.synchronize();
+          // synchronize() either consumed the separating ';' already or left
+          // us sitting on a statement-starting keyword / 'end' — either way,
+          // re-enter the loop instead of also matching a ';' below.
+          continue;
+        }
+      } else {
+        statements.push(this.parseStatement());
+      }
       // In Pascal ';' is a statement separator, not a terminator: it is
       // optional before the block closer ('end'/'until'). Consume it when
       // present and keep going; otherwise stop and let the caller match the
@@ -352,6 +395,31 @@ class Parser {
       if (!this.match('DELIMITER_SEMICOLON')) break;
     }
     return statements;
+  }
+
+  // Panic-mode recovery: skip tokens until we land on a plausible statement
+  // boundary. Two stopping conditions: we just consumed a ';' (the natural
+  // statement separator), or the lookahead token starts a new statement /
+  // closes the current block ('begin', 'if', 'while', 'for', 'repeat',
+  // 'case', 'end', 'until'). Only used when `recoverFromErrors` is on.
+  private synchronize(): void {
+    if (this.match('DELIMITER_SEMICOLON')) return;
+    while (!this.isAtEnd()) {
+      if (
+        this.checkKeyword('begin') ||
+        this.checkKeyword('if') ||
+        this.checkKeyword('while') ||
+        this.checkKeyword('for') ||
+        this.checkKeyword('repeat') ||
+        this.checkKeyword('case') ||
+        this.checkKeyword('end') ||
+        this.checkKeyword('until')
+      ) {
+        return;
+      }
+      this.advance();
+      if (this.previous().type === 'DELIMITER_SEMICOLON') return;
+    }
   }
 
   private parseStatement(): Statement {
@@ -721,6 +789,29 @@ class Parser {
  */
 export function parse(source: string): Program {
   return new Parser(source).parse();
+}
+
+/**
+ * Parses Pascal source in recovery mode: statement-level syntax errors are
+ * recorded instead of aborting the parse, so a single pass can report every
+ * error found rather than just the first one. The returned `program` is a
+ * best-effort AST (statements that failed to parse are omitted from their
+ * containing block); check `errors` to know whether the source was fully valid.
+ *
+ * Only statement lists (program body, blocks, compound statements) recover —
+ * a malformed program header or declaration section still throws, mirroring
+ * `parse()`. This covers the common case (multiple bad statements in a
+ * program) without taking on the added complexity of resyncing declarations.
+ *
+ * @param source - The Pascal source code to parse
+ * @returns The best-effort AST plus the list of diagnostics collected
+ * @throws {ParseError} If a non-statement-list error (program header,
+ *   declarations, or a lexical error) prevents parsing from continuing
+ */
+export function parseWithRecovery(source: string): ParseResult {
+  const parser = new Parser(source, { recoverFromErrors: true });
+  const program = parser.parse();
+  return { program, errors: parser.getErrors() };
 }
 
 /**

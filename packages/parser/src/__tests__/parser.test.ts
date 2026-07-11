@@ -1,4 +1,4 @@
-import { parse, isValid } from '../parser';
+import { parse, isValid, parseWithRecovery } from '../parser';
 import { TokenizeError } from 'pascal-tokenizer';
 import {
   ParseError,
@@ -423,6 +423,94 @@ end.`);
       const deep = `program P; begin x := ${'('.repeat(5000)}1${')'.repeat(5000)}; end.`;
       expect(() => parse(deep)).toThrow(ParseError);
       expect(isValid(deep)).toBe(false);
+    });
+  });
+
+  describe('parseWithRecovery', () => {
+    it('reports every bad statement in one pass instead of stopping at the first', () => {
+      const source = `
+program MultiError;
+begin
+    x := ;
+    y := 5;
+    z := ;
+    w := 10;
+end.`;
+      const { program, errors } = parseWithRecovery(source);
+
+      expect(errors).toHaveLength(2);
+      expect(errors[0]).toBeInstanceOf(ParseError);
+      expect(errors[1]).toBeInstanceOf(ParseError);
+
+      // The two well-formed statements still make it into the AST.
+      expect(program.statements).toHaveLength(2);
+      expect(program.statements[0]).toMatchObject({
+        type: 'AssignmentStatement',
+        left: { name: 'y' },
+      });
+      expect(program.statements[1]).toMatchObject({
+        type: 'AssignmentStatement',
+        left: { name: 'w' },
+      });
+    });
+
+    it('recovers from a token that cannot start a statement, not just a bad expression', () => {
+      const source = `
+program Bad;
+begin
+    x := 1;
+    123;
+    y := 2;
+end.`;
+      const { program, errors } = parseWithRecovery(source);
+
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toMatch(/Unexpected token in statement/);
+      // Only the two well-formed assignments (x, y) survive; the bare `123;`
+      // is neither.
+      expect(program.statements).toHaveLength(2);
+      expect(program.statements.map((s) => s.type)).toEqual([
+        'AssignmentStatement',
+        'AssignmentStatement',
+      ]);
+    });
+
+    it('returns zero errors for source that is already valid', () => {
+      const source = `program Ok; begin writeln('fine'); end.`;
+      const { program, errors } = parseWithRecovery(source);
+      expect(errors).toHaveLength(0);
+      expect(program.statements).toHaveLength(1);
+    });
+
+    it('does not change default parse() behavior: still throws on the first error', () => {
+      const source = `
+program MultiError;
+begin
+    x := ;
+    y := 5;
+end.`;
+      expect(() => parse(source)).toThrow(ParseError);
+      // Confirms recovery mode is strictly additive: parseWithRecovery on the
+      // same source instead collects the error and keeps going.
+      const { errors } = parseWithRecovery(source);
+      expect(errors).toHaveLength(1);
+    });
+
+    it('recovers inside a compound statement nested in an if/while', () => {
+      const source = `
+program Nested;
+var i: integer;
+begin
+    i := 0;
+    while i <= 3 do
+    begin
+        writeln(i);
+        := ;
+        i := i + 1;
+    end;
+end.`;
+      const { errors } = parseWithRecovery(source);
+      expect(errors).toHaveLength(1);
     });
   });
 });
