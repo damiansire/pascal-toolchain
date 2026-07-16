@@ -1,0 +1,53 @@
+{
+  "type": "Program",
+  "name": "HelloWorld",
+  "declarations": [],
+  "statements": [
+    {
+      "type": "CallStatement",
+      "name": "writeln",
+      "arguments": [
+        {
+          "type": "StringLiteral",
+          "value": "Hello, World!",
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        }
+      ],
+      "location": {
+        "start": {
+          "line": 3,
+          "column": 3,
+          "offset": 28
+        },
+        "end": {
+          "line": 3,
+          "column": 10,
+          "offset": 35
+        }
+      }
+    }
+  ],
+  "location": {
+    "start": {
+      "line": 0,
+      "column": 0,
+      "offset": 0
+    },
+    "end": {
+      "line": 0,
+      "column": 0,
+      "offset": 0
+    }
+  }
+}

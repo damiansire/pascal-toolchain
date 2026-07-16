@@ -1,0 +1,666 @@
+{
+  "type": "Program",
+  "name": "Declarations",
+  "declarations": [
+    {
+      "type": "ConstantDeclaration",
+      "name": "LIMIT",
+      "value": {
+        "type": "NumericLiteral",
+        "value": 100,
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "ConstantDeclaration",
+      "name": "GREETING",
+      "value": {
+        "type": "StringLiteral",
+        "value": "hola",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "ConstantDeclaration",
+      "name": "NEG",
+      "value": {
+        "type": "UnaryExpression",
+        "operator": "-",
+        "argument": {
+          "type": "NumericLiteral",
+          "value": 5,
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        },
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "VariableDeclaration",
+      "name": "x",
+      "varType": "integer",
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "VariableDeclaration",
+      "name": "y",
+      "varType": "integer",
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "VariableDeclaration",
+      "name": "price",
+      "varType": "real",
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "VariableDeclaration",
+      "name": "name",
+      "varType": "string",
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "VariableDeclaration",
+      "name": "ok",
+      "varType": "boolean",
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "VariableDeclaration",
+      "name": "scores",
+      "varType": "integer",
+      "arrayBounds": {
+        "low": 1,
+        "high": 10
+      },
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "VariableDeclaration",
+      "name": "offsets",
+      "varType": "real",
+      "arrayBounds": {
+        "low": -3,
+        "high": 3
+      },
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    }
+  ],
+  "statements": [
+    {
+      "type": "AssignmentStatement",
+      "left": {
+        "type": "Identifier",
+        "name": "x",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "right": {
+        "type": "Identifier",
+        "name": "LIMIT",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 14,
+          "column": 3,
+          "offset": 219
+        },
+        "end": {
+          "line": 14,
+          "column": 4,
+          "offset": 220
+        }
+      }
+    },
+    {
+      "type": "AssignmentStatement",
+      "left": {
+        "type": "Identifier",
+        "name": "y",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "right": {
+        "type": "Identifier",
+        "name": "NEG",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 15,
+          "column": 3,
+          "offset": 233
+        },
+        "end": {
+          "line": 15,
+          "column": 4,
+          "offset": 234
+        }
+      }
+    },
+    {
+      "type": "AssignmentStatement",
+      "left": {
+        "type": "Identifier",
+        "name": "price",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "right": {
+        "type": "NumericLiteral",
+        "value": 9.99,
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 16,
+          "column": 3,
+          "offset": 245
+        },
+        "end": {
+          "line": 16,
+          "column": 8,
+          "offset": 250
+        }
+      }
+    },
+    {
+      "type": "AssignmentStatement",
+      "left": {
+        "type": "Identifier",
+        "name": "name",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "right": {
+        "type": "Identifier",
+        "name": "GREETING",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 17,
+          "column": 3,
+          "offset": 262
+        },
+        "end": {
+          "line": 17,
+          "column": 7,
+          "offset": 266
+        }
+      }
+    },
+    {
+      "type": "AssignmentStatement",
+      "left": {
+        "type": "Identifier",
+        "name": "ok",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "right": {
+        "type": "BooleanLiteral",
+        "value": true,
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 18,
+          "column": 3,
+          "offset": 282
+        },
+        "end": {
+          "line": 18,
+          "column": 5,
+          "offset": 284
+        }
+      }
+    },
+    {
+      "type": "AssignmentStatement",
+      "left": {
+        "type": "IndexExpression",
+        "array": {
+          "type": "Identifier",
+          "name": "scores",
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        },
+        "index": {
+          "type": "NumericLiteral",
+          "value": 1,
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        },
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "right": {
+        "type": "Identifier",
+        "name": "x",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 19,
+          "column": 3,
+          "offset": 296
+        },
+        "end": {
+          "line": 19,
+          "column": 9,
+          "offset": 302
+        }
+      }
+    },
+    {
+      "type": "AssignmentStatement",
+      "left": {
+        "type": "IndexExpression",
+        "array": {
+          "type": "Identifier",
+          "name": "offsets",
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        },
+        "index": {
+          "type": "UnaryExpression",
+          "operator": "-",
+          "argument": {
+            "type": "NumericLiteral",
+            "value": 2,
+            "location": {
+              "start": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              },
+              "end": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              }
+            }
+          },
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        },
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "right": {
+        "type": "Identifier",
+        "name": "price",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 20,
+          "column": 3,
+          "offset": 314
+        },
+        "end": {
+          "line": 20,
+          "column": 10,
+          "offset": 321
+        }
+      }
+    }
+  ],
+  "location": {
+    "start": {
+      "line": 0,
+      "column": 0,
+      "offset": 0
+    },
+    "end": {
+      "line": 0,
+      "column": 0,
+      "offset": 0
+    }
+  }
+}

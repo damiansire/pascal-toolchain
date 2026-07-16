@@ -1,0 +1,1 @@
+TokenizeError: Unknown character '$' at line 5, column 10

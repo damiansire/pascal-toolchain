@@ -45,10 +45,22 @@ older `formatPascalCode` works off the token stream directly.
 ## Where tests go
 
 Each package owns its tests under `src/__tests__/` (tokenizer uses
-`__tests__/`). They run with Jest via `ts-jest`. The compiler additionally uses
-**golden fixtures**: `packages/compiler/src/__tests__/fixtures/<name>.pas`
-exercised by `fixtures.test.ts`. Adding compiler coverage = adding a `.pas`
-fixture, not new test boilerplate.
+`__tests__/`), split by area — tokenizer: `literals` / `comments` / `eof`;
+parser: `precedence` / `error-recovery` / `fuzz` (property-based, fast-check) /
+`golden`; compiler: `codegen` / `fixtures` / `integration`. They run with Jest
+via `ts-jest`.
+
+Two golden corpora exist:
+
+- **Parser golden corpus**: `tests/golden/` at the repo root — valid programs
+  with their expected AST (`.ast.json`) and invalid programs with their
+  expected diagnostic (`.error.txt`), walked by
+  `packages/parser/src/__tests__/golden.test.ts`. Regenerate with
+  `UPDATE_GOLDEN=1 npm test -w pascal-parser -- golden` (see
+  `tests/golden/README.md`).
+- **Compiler golden fixtures**: `packages/compiler/src/__tests__/fixtures/<name>.pas`
+  exercised by `fixtures.test.ts`. Adding compiler coverage = adding a `.pas`
+  fixture, not new test boilerplate.
 
 ## Essential commands
 

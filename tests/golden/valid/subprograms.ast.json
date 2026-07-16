@@ -1,0 +1,988 @@
+{
+  "type": "Program",
+  "name": "Subprograms",
+  "declarations": [
+    {
+      "type": "VariableDeclaration",
+      "name": "n",
+      "varType": "integer",
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "FunctionDeclaration",
+      "name": "double",
+      "parameters": [
+        {
+          "type": "Parameter",
+          "name": "value",
+          "paramType": "integer",
+          "isVar": false,
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        }
+      ],
+      "returnType": "integer",
+      "body": {
+        "type": "Block",
+        "declarations": [],
+        "statements": [
+          {
+            "type": "AssignmentStatement",
+            "left": {
+              "type": "Identifier",
+              "name": "double",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "right": {
+              "type": "BinaryExpression",
+              "operator": "*",
+              "left": {
+                "type": "Identifier",
+                "name": "value",
+                "location": {
+                  "start": {
+                    "line": 0,
+                    "column": 0,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 0,
+                    "column": 0,
+                    "offset": 0
+                  }
+                }
+              },
+              "right": {
+                "type": "NumericLiteral",
+                "value": 2,
+                "location": {
+                  "start": {
+                    "line": 0,
+                    "column": 0,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 0,
+                    "column": 0,
+                    "offset": 0
+                  }
+                }
+              },
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "location": {
+              "start": {
+                "line": 7,
+                "column": 3,
+                "offset": 90
+              },
+              "end": {
+                "line": 7,
+                "column": 9,
+                "offset": 96
+              }
+            }
+          }
+        ],
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "FunctionDeclaration",
+      "name": "sumTo",
+      "parameters": [
+        {
+          "type": "Parameter",
+          "name": "n",
+          "paramType": "integer",
+          "isVar": false,
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        }
+      ],
+      "returnType": "integer",
+      "body": {
+        "type": "Block",
+        "declarations": [
+          {
+            "type": "VariableDeclaration",
+            "name": "i",
+            "varType": "integer",
+            "location": {
+              "start": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              },
+              "end": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              }
+            }
+          },
+          {
+            "type": "VariableDeclaration",
+            "name": "total",
+            "varType": "integer",
+            "location": {
+              "start": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              },
+              "end": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              }
+            }
+          }
+        ],
+        "statements": [
+          {
+            "type": "AssignmentStatement",
+            "left": {
+              "type": "Identifier",
+              "name": "total",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "right": {
+              "type": "NumericLiteral",
+              "value": 0,
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "location": {
+              "start": {
+                "line": 14,
+                "column": 3,
+                "offset": 187
+              },
+              "end": {
+                "line": 14,
+                "column": 8,
+                "offset": 192
+              }
+            }
+          },
+          {
+            "type": "ForStatement",
+            "variable": {
+              "type": "Identifier",
+              "name": "i",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "start": {
+              "type": "NumericLiteral",
+              "value": 1,
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "end": {
+              "type": "Identifier",
+              "name": "n",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "body": {
+              "type": "AssignmentStatement",
+              "left": {
+                "type": "Identifier",
+                "name": "total",
+                "location": {
+                  "start": {
+                    "line": 0,
+                    "column": 0,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 0,
+                    "column": 0,
+                    "offset": 0
+                  }
+                }
+              },
+              "right": {
+                "type": "BinaryExpression",
+                "operator": "+",
+                "left": {
+                  "type": "Identifier",
+                  "name": "total",
+                  "location": {
+                    "start": {
+                      "line": 0,
+                      "column": 0,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 0,
+                      "column": 0,
+                      "offset": 0
+                    }
+                  }
+                },
+                "right": {
+                  "type": "Identifier",
+                  "name": "i",
+                  "location": {
+                    "start": {
+                      "line": 0,
+                      "column": 0,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 0,
+                      "column": 0,
+                      "offset": 0
+                    }
+                  }
+                },
+                "location": {
+                  "start": {
+                    "line": 0,
+                    "column": 0,
+                    "offset": 0
+                  },
+                  "end": {
+                    "line": 0,
+                    "column": 0,
+                    "offset": 0
+                  }
+                }
+              },
+              "location": {
+                "start": {
+                  "line": 16,
+                  "column": 5,
+                  "offset": 224
+                },
+                "end": {
+                  "line": 16,
+                  "column": 10,
+                  "offset": 229
+                }
+              }
+            },
+            "direction": "to",
+            "location": {
+              "start": {
+                "line": 15,
+                "column": 3,
+                "offset": 201
+              },
+              "end": {
+                "line": 15,
+                "column": 6,
+                "offset": 204
+              }
+            }
+          },
+          {
+            "type": "AssignmentStatement",
+            "left": {
+              "type": "Identifier",
+              "name": "sumTo",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "right": {
+              "type": "Identifier",
+              "name": "total",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "location": {
+              "start": {
+                "line": 17,
+                "column": 3,
+                "offset": 246
+              },
+              "end": {
+                "line": 17,
+                "column": 8,
+                "offset": 251
+              }
+            }
+          }
+        ],
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "ProcedureDeclaration",
+      "name": "reset",
+      "parameters": [
+        {
+          "type": "Parameter",
+          "name": "target",
+          "paramType": "integer",
+          "isVar": true,
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        }
+      ],
+      "body": {
+        "type": "Block",
+        "declarations": [],
+        "statements": [
+          {
+            "type": "AssignmentStatement",
+            "left": {
+              "type": "Identifier",
+              "name": "target",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "right": {
+              "type": "NumericLiteral",
+              "value": 0,
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "location": {
+              "start": {
+                "line": 22,
+                "column": 3,
+                "offset": 314
+              },
+              "end": {
+                "line": 22,
+                "column": 9,
+                "offset": 320
+              }
+            }
+          }
+        ],
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    },
+    {
+      "type": "ProcedureDeclaration",
+      "name": "greet",
+      "parameters": [
+        {
+          "type": "Parameter",
+          "name": "name",
+          "paramType": "string",
+          "isVar": false,
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        },
+        {
+          "type": "Parameter",
+          "name": "times",
+          "paramType": "integer",
+          "isVar": false,
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        }
+      ],
+      "body": {
+        "type": "Block",
+        "declarations": [
+          {
+            "type": "VariableDeclaration",
+            "name": "i",
+            "varType": "integer",
+            "location": {
+              "start": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              },
+              "end": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              }
+            }
+          }
+        ],
+        "statements": [
+          {
+            "type": "ForStatement",
+            "variable": {
+              "type": "Identifier",
+              "name": "i",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "start": {
+              "type": "NumericLiteral",
+              "value": 1,
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "end": {
+              "type": "Identifier",
+              "name": "times",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            },
+            "body": {
+              "type": "CallStatement",
+              "name": "writeln",
+              "arguments": [
+                {
+                  "type": "Identifier",
+                  "name": "name",
+                  "location": {
+                    "start": {
+                      "line": 0,
+                      "column": 0,
+                      "offset": 0
+                    },
+                    "end": {
+                      "line": 0,
+                      "column": 0,
+                      "offset": 0
+                    }
+                  }
+                }
+              ],
+              "location": {
+                "start": {
+                  "line": 30,
+                  "column": 5,
+                  "offset": 433
+                },
+                "end": {
+                  "line": 30,
+                  "column": 12,
+                  "offset": 440
+                }
+              }
+            },
+            "direction": "to",
+            "location": {
+              "start": {
+                "line": 29,
+                "column": 3,
+                "offset": 406
+              },
+              "end": {
+                "line": 29,
+                "column": 6,
+                "offset": 409
+              }
+            }
+          }
+        ],
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        },
+        "end": {
+          "line": 0,
+          "column": 0,
+          "offset": 0
+        }
+      }
+    }
+  ],
+  "statements": [
+    {
+      "type": "AssignmentStatement",
+      "left": {
+        "type": "Identifier",
+        "name": "n",
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "right": {
+        "type": "CallExpression",
+        "callee": "double",
+        "arguments": [
+          {
+            "type": "NumericLiteral",
+            "value": 21,
+            "location": {
+              "start": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              },
+              "end": {
+                "line": 0,
+                "column": 0,
+                "offset": 0
+              }
+            }
+          }
+        ],
+        "location": {
+          "start": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "column": 0,
+            "offset": 0
+          }
+        }
+      },
+      "location": {
+        "start": {
+          "line": 34,
+          "column": 3,
+          "offset": 462
+        },
+        "end": {
+          "line": 34,
+          "column": 4,
+          "offset": 463
+        }
+      }
+    },
+    {
+      "type": "CallStatement",
+      "name": "writeln",
+      "arguments": [
+        {
+          "type": "CallExpression",
+          "callee": "sumTo",
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "n",
+              "location": {
+                "start": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                },
+                "end": {
+                  "line": 0,
+                  "column": 0,
+                  "offset": 0
+                }
+              }
+            }
+          ],
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        }
+      ],
+      "location": {
+        "start": {
+          "line": 35,
+          "column": 3,
+          "offset": 481
+        },
+        "end": {
+          "line": 35,
+          "column": 10,
+          "offset": 488
+        }
+      }
+    },
+    {
+      "type": "CallStatement",
+      "name": "reset",
+      "arguments": [
+        {
+          "type": "Identifier",
+          "name": "n",
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        }
+      ],
+      "location": {
+        "start": {
+          "line": 36,
+          "column": 3,
+          "offset": 502
+        },
+        "end": {
+          "line": 36,
+          "column": 8,
+          "offset": 507
+        }
+      }
+    },
+    {
+      "type": "CallStatement",
+      "name": "greet",
+      "arguments": [
+        {
+          "type": "StringLiteral",
+          "value": "hola",
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        },
+        {
+          "type": "NumericLiteral",
+          "value": 2,
+          "location": {
+            "start": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            },
+            "end": {
+              "line": 0,
+              "column": 0,
+              "offset": 0
+            }
+          }
+        }
+      ],
+      "location": {
+        "start": {
+          "line": 37,
+          "column": 3,
+          "offset": 514
+        },
+        "end": {
+          "line": 37,
+          "column": 8,
+          "offset": 519
+        }
+      }
+    }
+  ],
+  "location": {
+    "start": {
+      "line": 0,
+      "column": 0,
+      "offset": 0
+    },
+    "end": {
+      "line": 0,
+      "column": 0,
+      "offset": 0
+    }
+  }
+}
