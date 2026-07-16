@@ -33,10 +33,7 @@ export function analyzeStrict(program: Program): AnalysisResult {
   const result = analyze(program);
   const errors = result.diagnostics.filter((d) => d.severity === 'error');
   if (errors.length > 0) {
-    throw new SemanticError(
-      `El análisis semántico encontró ${errors.length} error(es)`,
-      errors,
-    );
+    throw new SemanticError(`El análisis semántico encontró ${errors.length} error(es)`, errors);
   }
   return result;
 }

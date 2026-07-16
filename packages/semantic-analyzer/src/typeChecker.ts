@@ -145,10 +145,16 @@ class TypeChecker {
 
     if (['+', '-', '*', '/', 'mod'].includes(op)) {
       if (!isNumeric(leftType) && leftType !== 'unknown') {
-        this.error(`Operando izquierdo de '${operator}' debe ser numérico, no ${formatType(leftType)}`, location);
+        this.error(
+          `Operando izquierdo de '${operator}' debe ser numérico, no ${formatType(leftType)}`,
+          location,
+        );
       }
       if (!isNumeric(rightType) && rightType !== 'unknown') {
-        this.error(`Operando derecho de '${operator}' debe ser numérico, no ${formatType(rightType)}`, location);
+        this.error(
+          `Operando derecho de '${operator}' debe ser numérico, no ${formatType(rightType)}`,
+          location,
+        );
       }
       if (op === 'mod') return 'integer';
       return leftType === 'real' || rightType === 'real' ? 'real' : 'integer';
@@ -166,10 +172,16 @@ class TypeChecker {
 
     if (op === 'and' || op === 'or') {
       if (leftType !== 'boolean' && leftType !== 'unknown') {
-        this.error(`Operando izquierdo de '${operator}' debe ser boolean, no ${formatType(leftType)}`, location);
+        this.error(
+          `Operando izquierdo de '${operator}' debe ser boolean, no ${formatType(leftType)}`,
+          location,
+        );
       }
       if (rightType !== 'boolean' && rightType !== 'unknown') {
-        this.error(`Operando derecho de '${operator}' debe ser boolean, no ${formatType(rightType)}`, location);
+        this.error(
+          `Operando derecho de '${operator}' debe ser boolean, no ${formatType(rightType)}`,
+          location,
+        );
       }
       return 'boolean';
     }
@@ -193,7 +205,10 @@ class TypeChecker {
     }
     // Unary +/-
     if (!isNumeric(argType) && argType !== 'unknown') {
-      this.error(`Operando de '${operator}' unario debe ser numérico, no ${formatType(argType)}`, location);
+      this.error(
+        `Operando de '${operator}' unario debe ser numérico, no ${formatType(argType)}`,
+        location,
+      );
     }
     return argType;
   }
@@ -226,7 +241,13 @@ class TypeChecker {
     const lower = callee.toLowerCase();
     const shadowed = scope.resolve(callee) !== undefined;
 
-    if (!shadowed && (NUMERIC_UNARY_BUILTINS.has(lower) || ROUNDING_BUILTINS.has(lower) || lower === 'sqrt' || lower === 'odd')) {
+    if (
+      !shadowed &&
+      (NUMERIC_UNARY_BUILTINS.has(lower) ||
+        ROUNDING_BUILTINS.has(lower) ||
+        lower === 'sqrt' ||
+        lower === 'odd')
+    ) {
       return this.inferBuiltinCall(lower, args, scope, location);
     }
 
@@ -373,7 +394,10 @@ class TypeChecker {
   private checkCondition(condition: Expression, scope: Scope, context: string): void {
     const type = this.inferExpression(condition, scope);
     if (type !== 'boolean' && type !== 'unknown') {
-      this.error(`La condición de '${context}' debe ser boolean, no ${formatType(type)}`, condition.location);
+      this.error(
+        `La condición de '${context}' debe ser boolean, no ${formatType(type)}`,
+        condition.location,
+      );
     }
   }
 
@@ -391,15 +415,24 @@ class TypeChecker {
   private checkFor(stmt: ForStatement, scope: Scope): void {
     const varType = this.resolveIdentifier(stmt.variable.name, scope, stmt.variable.location);
     if (varType !== 'integer' && varType !== 'unknown') {
-      this.error(`La variable de control de 'for' debe ser integer, no ${formatType(varType)}`, stmt.variable.location);
+      this.error(
+        `La variable de control de 'for' debe ser integer, no ${formatType(varType)}`,
+        stmt.variable.location,
+      );
     }
     const startType = this.inferExpression(stmt.start, scope);
     if (startType !== 'integer' && startType !== 'unknown') {
-      this.error(`El valor inicial de 'for' debe ser integer, no ${formatType(startType)}`, stmt.location);
+      this.error(
+        `El valor inicial de 'for' debe ser integer, no ${formatType(startType)}`,
+        stmt.location,
+      );
     }
     const endType = this.inferExpression(stmt.end, scope);
     if (endType !== 'integer' && endType !== 'unknown') {
-      this.error(`El valor final de 'for' debe ser integer, no ${formatType(endType)}`, stmt.location);
+      this.error(
+        `El valor final de 'for' debe ser integer, no ${formatType(endType)}`,
+        stmt.location,
+      );
     }
     this.checkStatement(stmt.body, scope);
   }
@@ -434,7 +467,10 @@ class TypeChecker {
       return;
     }
     if (symbol.kind !== 'function' && symbol.kind !== 'procedure') {
-      this.error(`'${stmt.name}' no es un procedimiento o función y no puede llamarse`, stmt.location);
+      this.error(
+        `'${stmt.name}' no es un procedimiento o función y no puede llamarse`,
+        stmt.location,
+      );
       for (const arg of stmt.arguments) this.inferExpression(arg, scope);
       return;
     }

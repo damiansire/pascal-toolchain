@@ -119,7 +119,7 @@ describe('assignment type mismatches', () => {
         Items[1] := 'no';
       end.
     `);
-    expect(msgs).toEqual(["No se puede asignar string a un elemento de tipo integer"]);
+    expect(msgs).toEqual(['No se puede asignar string a un elemento de tipo integer']);
   });
 });
 

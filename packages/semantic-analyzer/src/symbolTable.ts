@@ -89,7 +89,13 @@ function declareSubprogram(
 
   declareOrReport(
     scope,
-    { name: decl.name, kind: isFunction ? 'function' : 'procedure', type: returnType, parameters, location: decl.location },
+    {
+      name: decl.name,
+      kind: isFunction ? 'function' : 'procedure',
+      type: returnType,
+      parameters,
+      location: decl.location,
+    },
     diagnostics,
   );
 
@@ -103,7 +109,11 @@ function declareSubprogram(
     // body (`FunctionName := value;`). Model that as an implicit variable of the
     // return type in the function's own scope, so assignment-compatibility checks
     // apply to it exactly like any other target.
-    declareOrReport(child, { name: decl.name, kind: 'variable', type: returnType, location: decl.location }, diagnostics);
+    declareOrReport(
+      child,
+      { name: decl.name, kind: 'variable', type: returnType, location: decl.location },
+      diagnostics,
+    );
   }
   if (decl.body.declarations) {
     declareAll(child, decl.body.declarations, scopeOf, diagnostics);
@@ -133,7 +143,12 @@ function declareAll(
       case 'ConstantDeclaration':
         declareOrReport(
           scope,
-          { name: decl.name, kind: 'constant', type: inferLiteralType(decl.value), location: decl.location },
+          {
+            name: decl.name,
+            kind: 'constant',
+            type: inferLiteralType(decl.value),
+            location: decl.location,
+          },
           diagnostics,
         );
         break;

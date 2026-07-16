@@ -56,7 +56,9 @@ export interface SymbolEntry {
   type: PascalType;
   /** Present only for `kind: 'function' | 'procedure'`. */
   parameters?: ParameterInfo[];
-  location?: SourceLocation;
+  // `| undefined` is deliberate (exactOptionalPropertyTypes): callers forward the
+  // parser's own optional `node.location` without re-checking it at every site.
+  location?: SourceLocation | undefined;
 }
 
 export type DiagnosticSeverity = 'error' | 'warning';
@@ -64,7 +66,8 @@ export type DiagnosticSeverity = 'error' | 'warning';
 export interface Diagnostic {
   severity: DiagnosticSeverity;
   message: string;
-  location?: SourceLocation;
+  // `| undefined` is deliberate (exactOptionalPropertyTypes): see SymbolEntry.
+  location?: SourceLocation | undefined;
 }
 
 /** Thrown by `analyzeStrict` when analysis produced at least one error diagnostic. */
