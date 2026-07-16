@@ -10,6 +10,11 @@
     "limit": "6 kB"
   },
   {
+    "name": "pascal-semantic-analyzer",
+    "path": "packages/semantic-analyzer/dist/index.js",
+    "limit": "9 kB"
+  },
+  {
     "name": "pascal-js-compiler",
     "path": "packages/compiler/dist/index.js",
     "limit": "9 kB"

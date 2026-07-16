@@ -16,7 +16,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "npm run build -w pascal-tokenizer && npm run build -w pascal-parser && npm run build -w pascal-js-compiler && npm run build -w pascal-code-formatter",
+    "build": "npm run build -w pascal-tokenizer && npm run build -w pascal-parser && npm run build -w pascal-semantic-analyzer && npm run build -w pascal-js-compiler && npm run build -w pascal-code-formatter",
     "test": "npm run test --workspaces --if-present",
     "test:types": "npm run test:types --workspaces --if-present",
     "size": "size-limit",
@@ -24,7 +24,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint:publish": "publint packages/tokenizer && publint packages/parser && publint packages/compiler && publint packages/code-formatter",
+    "lint:publish": "publint packages/tokenizer && publint packages/parser && publint packages/semantic-analyzer && publint packages/compiler && publint packages/code-formatter",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish"
