@@ -2,7 +2,7 @@
   "name": "pascal-toolchain",
   "version": "0.0.0",
   "private": true,
-  "description": "A Pascal compiler frontend written in TypeScript: tokenizer, parser and code formatter.",
+  "description": "A Pascal compiler frontend written in TypeScript: tokenizer, parser, semantic analyzer, JS compiler and code formatter.",
   "author": "Damian Sire",
   "license": "MIT",
   "repository": {
