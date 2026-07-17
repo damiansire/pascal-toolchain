@@ -1,6 +1,6 @@
 {
   "name": "pascal-semantic-analyzer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Symbol table, scope resolution and basic type checking for the Pascal AST",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -60,6 +60,6 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "pascal-parser": "^0.2.1"
+    "pascal-parser": "^0.3.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "pascal-code-formatter",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "A Pascal code formatter written in TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -46,8 +46,8 @@
   },
   "dependencies": {
     "counterweight-stack": "0.0.1",
-    "pascal-parser": "^0.2.1",
-    "pascal-tokenizer": "^0.0.3"
+    "pascal-parser": "^0.3.0",
+    "pascal-tokenizer": "^0.1.0"
   },
   "directories": {
     "doc": "docs",
