@@ -1,7 +1,9 @@
 # lychee config for the README/docs link check (.github/workflows/links.yml).
 
-# Don't check page anchors/fragments (e.g. #readme) — many valid targets omit them.
-include_fragments = false
+# Don't check page anchors/fragments (e.g. #readme): many valid targets omit them.
+# lychee >= 0.24 takes a fragment mode string here ("none" | "anchor-only" |
+# "text-only" | "full"), not a boolean.
+include_fragments = "none"
 
 # Retry transient failures before flagging a link as dead.
 max_retries = 3
